@@ -6,8 +6,8 @@ This document tracks the project's tasks based on the 1-week sprint plan.
 
 | Day     | Deliverable                                         | Status      |
 | :------ | :-------------------------------------------------- | :---------- |
-| **Day 1** | Repo scaffold, env setup, Prompt Interpreter done.  | ⏳ In Progress |
-| **Day 2** | Feed Harvester + basic extraction.                  | 📋 To Do     |
+| **Day 1** | Repo scaffold, env setup, Prompt Interpreter done.  | ✅ Done |
+| **Day 2** | Feed Harvester + basic extraction.                  | ⏳ In Progress |
 | **Day 3** | Filtering engine, logging stub.                     | 📋 To Do     |
 | **Day 4** | Research & Comment draft; CLI preview.              | 📋 To Do     |
 | **Day 5** | Engagement Executor (like, comment) + supervised UI.| 📋 To Do     |
@@ -46,14 +46,14 @@ This document tracks the project's tasks based on the 1-week sprint plan.
   - [x] **Task 2: GREEN** - Implement the minimal `Harvester` class and `harvest` method in `harvester.py` to make the test pass.
   - [x] **Task 3: REFACTOR** - Clean up the initial implementation, add docstrings, and improve the task-generation logic.
 
-- [ ] **Phase 2: Expanding Functionality (Harvester - TDD)**
-  - [ ] **Task 4: TDD - Implement Core Post Fetching and Detailed Engagement Handling**
+- [x] **Phase 2: Expanding Functionality (Harvester - TDD)**
+  - [x] **Task 4: TDD - Implement Core Post Fetching and Detailed Engagement Handling**
     - [x] **Sub-Task 4.1: Define Post Data Structure** - Create a Pydantic model (`FetchedPost`) for structured post data (e.g., URL, author, content, engagement counts).
-    - [ ] **Sub-Task 4.2: TDD - Implement Post Fetching Logic**
-        - [ ] **RED**: Write a failing test (`test_harvester_fetches_posts`) ensuring `Harvester.harvest` returns a list of `FetchedPost` objects when given a command to fetch posts. Mock the browser agent to return simulated structured post data.
-        - [ ] **GREEN**: Modify `Harvester.harvest` to generate a task string for the browser agent to find and extract post details. Parse the agent's (mocked) output into `List[FetchedPost]`.
-        - [ ] **REFACTOR**: Clean up post fetching and parsing logic.
-    - [ ] **Sub-Task 4.3: TDD - Refine Engagement Command Handling** (like, comment, connect)
+    - [x] **Sub-Task 4.2: TDD - Implement Post Fetching Logic**
+        - [x] **RED**: Write a failing test (`test_harvester_fetches_posts`) ensuring `Harvester.harvest` returns a list of `FetchedPost` objects when given a command to fetch posts. Mock the browser agent to return simulated structured post data.
+        - [x] **GREEN**: Modify `Harvester.harvest` to generate a task string for the browser agent to find and extract post details. Parse the agent's (mocked) output into `List[FetchedPost]`.
+        - [x] **REFACTOR**: Clean up post fetching and parsing logic.
+    - [x] **Sub-Task 4.3: TDD - Refine Engagement Command Handling** (like, comment, connect)
         - [x] Initial tests for `like`, `comment`, `connect` created (assuming agent handles full "find and engage" sequence).
         - [ ] Review and adapt these tests/logic if Harvester's role shifts to primarily fetching, with a separate Executor handling engagements on fetched posts.
 
