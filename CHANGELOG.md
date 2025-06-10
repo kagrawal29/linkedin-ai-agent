@@ -3,6 +3,7 @@
 ## [0.1.0] - YYYY-MM-DD
 
 ### Added
+- **Interpreter UI**: Created a simple Flask and JavaScript-based web UI to provide an interactive way to test the `PromptInterpreter`.
 - **Prompt Interpreter**: Implemented the `PromptInterpreter` module to parse natural language prompts into structured commands using the OpenAI API.
 - **TDD Workflow**: Established a rigorous Test-Driven Development workflow with pytest.
 - **Pydantic Models**: Refactored the command structure to use Pydantic for robust, type-safe JSON parsing from the LLM.
