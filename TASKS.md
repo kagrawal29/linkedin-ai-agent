@@ -48,7 +48,7 @@ This document tracks the project's tasks based on the 1-week sprint plan.
 
 - [ ] **Phase 2: Expanding Functionality (Harvester - TDD)**
   - [ ] **Task 4: TDD - Implement Core Post Fetching and Detailed Engagement Handling**
-    - [ ] **Sub-Task 4.1: Define Post Data Structure** - Create a Pydantic model (`FetchedPost`) for structured post data (e.g., URL, author, content, engagement counts).
+    - [x] **Sub-Task 4.1: Define Post Data Structure** - Create a Pydantic model (`FetchedPost`) for structured post data (e.g., URL, author, content, engagement counts).
     - [ ] **Sub-Task 4.2: TDD - Implement Post Fetching Logic**
         - [ ] **RED**: Write a failing test (`test_harvester_fetches_posts`) ensuring `Harvester.harvest` returns a list of `FetchedPost` objects when given a command to fetch posts. Mock the browser agent to return simulated structured post data.
         - [ ] **GREEN**: Modify `Harvester.harvest` to generate a task string for the browser agent to find and extract post details. Parse the agent's (mocked) output into `List[FetchedPost]`.
