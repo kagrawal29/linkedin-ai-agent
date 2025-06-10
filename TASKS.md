@@ -46,14 +46,28 @@ This document tracks the project's tasks based on the 1-week sprint plan.
   - [x] **Task 2: GREEN** - Implement the minimal `Harvester` class and `harvest` method in `harvester.py` to make the test pass.
   - [x] **Task 3: REFACTOR** - Clean up the initial implementation, add docstrings, and improve the task-generation logic.
 
-- [ ] **Phase 2: Expanding Functionality and Robustness**
-  - [ ] **Task 4: TDD** - Add new tests for all other command types (`comment`, `connect`, etc.) and update the `harvest` method to pass them.
-  - [ ] **Task 5: Error Handling** - Implement and test error handling within the `harvest` method to gracefully manage potential failures from the browser agent.
+- [ ] **Phase 2: Expanding Functionality (Harvester - TDD)**
+  - [ ] **Task 4: TDD - Implement Core Post Fetching and Detailed Engagement Handling**
+    - [ ] **Sub-Task 4.1: Define Post Data Structure** - Create a Pydantic model (`FetchedPost`) for structured post data (e.g., URL, author, content, engagement counts).
+    - [ ] **Sub-Task 4.2: TDD - Implement Post Fetching Logic**
+        - [ ] **RED**: Write a failing test (`test_harvester_fetches_posts`) ensuring `Harvester.harvest` returns a list of `FetchedPost` objects when given a command to fetch posts. Mock the browser agent to return simulated structured post data.
+        - [ ] **GREEN**: Modify `Harvester.harvest` to generate a task string for the browser agent to find and extract post details. Parse the agent's (mocked) output into `List[FetchedPost]`.
+        - [ ] **REFACTOR**: Clean up post fetching and parsing logic.
+    - [ ] **Sub-Task 4.3: TDD - Refine Engagement Command Handling** (like, comment, connect)
+        - [x] Initial tests for `like`, `comment`, `connect` created (assuming agent handles full "find and engage" sequence).
+        - [ ] Review and adapt these tests/logic if Harvester's role shifts to primarily fetching, with a separate Executor handling engagements on fetched posts.
 
-- [ ] **Phase 3: Integration and Finalization**
-  - [x] **Task 6: Manual E2E Test** - Verified basic `browser-use` interaction with a live browser, including navigation and session reuse for logged-in LinkedIn access. Full `Interpreter` -> `Harvester` -> `browser-use` E2E test pending further module development.
-  - [ ] **Task 7: Documentation** - Update the `README.md` to document the new `Harvester` module.
-  - [ ] **Task 8: Merge** - Commit all changes to the `feature/harvester` branch and merge it into `master`.
+- [ ] **Phase 3: Integration and Finalization (Harvester)**
+  - [x] **Task 6.A: Basic Browser E2E Test** - Verified `browser-use` can access logged-in LinkedIn.
+  - [ ] **Task 6.B: UI E2E Test - Fetch and Display Posts**
+      - [ ] **Objective**: Test the flow: UI Prompt -> Interpreter -> Harvester (live post fetching) -> Display fetched posts on UI.
+      - [ ] **Steps**:
+          - [ ] Ensure Harvester's `harvest` method (from Task 4.2) can return `List[FetchedPost]` based on a live agent call.
+          - [ ] Modify the Flask app (`app.py`) to orchestrate this flow.
+          - [ ] Create/update an HTML template to render `List[FetchedPost]`.
+          - [ ] Manually test the full flow.
+  - [ ] **Task 7: Documentation** - Update `README.md` for Harvester.
+  - [ ] **Task 8: Merge** - Merge `feature/harvester` into `main`.
 
 #### Day 3: Filtering Engine & Logging Stub
 - [ ] **Implement `filter_engine.py`**
