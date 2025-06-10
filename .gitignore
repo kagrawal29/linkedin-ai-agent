@@ -36,3 +36,6 @@ venv/
 
 # OS-specific
 .DS_Store
+
+# E2E test scripts (temporary or diagnostic)
+e2e_test_linkedin_access.py

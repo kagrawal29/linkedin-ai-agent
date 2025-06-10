@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Virtual environment `venv` created and dependencies installed.
 - `pytest-asyncio` to `requirements.txt` for enabling asynchronous test functions.
 - `pytest-dotenv` to `requirements.txt` for automatic loading of `.env` file variables during tests.
+- **E2E Browser Testing**: Successfully executed an end-to-end test using `browser-use` to launch a browser, navigate to LinkedIn, and confirm that session cookies can be reused for accessing logged-in pages after a manual login. This validates the core browser automation capability.
 
 ### Changed
 - **Testing Framework**:
