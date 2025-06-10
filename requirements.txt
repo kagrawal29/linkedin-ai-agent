@@ -4,5 +4,6 @@ pydantic
 python-dotenv
 PyYAML
 pytest
+Flask
 # For Phase-2 Streamlit dashboard (optional)
 # streamlit

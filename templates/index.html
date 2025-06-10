@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Agent - Prompt Interpreter</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Prompt Interpreter</h1>
+        <p>Enter a natural language prompt to see the structured command output.</p>
+        <form id="prompt-form">
+            <textarea id="prompt-input" placeholder="e.g., Like 10 posts about machine learning"></textarea>
+            <button type="submit">Parse Prompt</button>
+        </form>
+        <h2>Output</h2>
+        <pre id="output-display"><code>{}</code></pre>
+    </div>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

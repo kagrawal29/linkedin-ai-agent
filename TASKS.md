@@ -33,7 +33,7 @@ This document tracks the project's tasks based on the 1-week sprint plan.
     - [x] **6. REFACTOR**: Improve the ambiguity-handling code.
 
 #### Bonus Task: Interpreter UI
-- [ ] **Implement Basic UI**: Create a simple web interface using Flask and the 21st Dev MCP to allow users to input a prompt and see the structured output from the `PromptInterpreter`.
+- [x] **Implement Basic UI**: Create a simple web interface using Flask to allow users to input a prompt and see the structured output from the `PromptInterpreter`.
 
 #### Day 2: Feed Harvester
 - [ ] **Implement `harvester.py`**
