@@ -1,0 +1,7 @@
+openai_api_key: ${OPENAI_API_KEY}
+mode_default: supervised     # or autonomous
+scroll_limit: 30             # iterations
+post_limit: 5
+engagement_types:
+  - comment
+  - like

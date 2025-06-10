@@ -1,0 +1,9 @@
+# Filtering engine configuration
+# See F-FH-4 in requirements spec
+
+keywords: ["AI", "strategy", "systems thinking"]
+author_class: null # e.g., 'influencer', 'ceo', 'developer'
+min_likes: 20
+min_comments: 5
+content_type_whitelist: ["article", "post"]
+author_following_only: false

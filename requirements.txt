@@ -1,0 +1,7 @@
+python-dotenv
+openai
+playwright
+PyYAML
+pytest
+# For Phase-2 Streamlit dashboard (optional)
+# streamlit

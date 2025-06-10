@@ -1,0 +1,52 @@
+## 1. Guiding Principles
+
+- **Clarity Over Cleverness**: Code should be simple, readable, and easy to understand.
+- **Plan Before Coding**: We will always define the architecture and tasks before writing implementation code, as we have done with the plain English comments and `TASKS.md`.
+- **Iterate in Small Steps**: We will build and test features incrementally to ensure stability.
+
+## 2. Codebase Structure
+
+The project follows a modular structure, with each file having a single, clear responsibility.
+
+- `agent.py`: The main orchestrator.
+- `*.py`: Specialized modules for interpreting, harvesting, filtering, etc.
+- `config/`: All user-configurable files (settings, persona, filters).
+- `tests/`: Contains all tests, mirroring the main project structure.
+- `*.md`: Documentation files (`README.md`, `SYSTEM_DESIGN.md`, `TASKS.md`, and this file).
+
+## 3. Test-Driven Development (TDD) Workflow
+
+Every new feature will be built following the **Red-Green-Refactor** cycle.
+
+1.  **RED**: Before writing any implementation code, we will first write an automated test for the new feature in the corresponding `tests/test_*.py` file. This test will initially fail, as the feature does not yet exist.
+2.  **GREEN**: We will then write the simplest, most minimal code required to actually implement the feature and make the test pass. The goal here is not perfection, but a working state.
+3.  **REFACTOR**: With a passing test as our safety net, we will clean up and improve the implementation code, making it more efficient and readable, while ensuring the test continues to pass.
+
+This cycle will be repeated for every piece of functionality.
+
+## 4. Task Management with `TASKS.md`
+
+- Our `TASKS.md` file is the single source of truth for the project's progress.
+- All work will be broken down into small, actionable steps within this file, following the TDD workflow.
+- We will update the status of tasks (e.g., from `[ ]` to `[x]`) as soon as they are completed.
+
+## 5. Git Workflow
+
+We will use a professional Git workflow to manage our codebase on GitHub.
+
+1.  **Feature Branches**: No work will be done directly on the `main` branch. For every new feature (e.g., "Implement Interpreter"), a new branch will be created (e.g., `feature/interpreter`).
+2.  **Atomic Commits**: We will make small, frequent commits. Each commit should represent a single, logical change (e.g., "RED: Add failing test for prompt parsing", "GREEN: Implement basic prompt parser").
+3.  **Pull Requests**: Once a feature is complete and all its tests are passing, a Pull Request (PR) will be opened to merge the feature branch back into `main`. This provides an opportunity for review.
+
+## 6. Changelog Management
+
+- All significant changes to the codebase will be documented in `CHANGELOG.md`.
+- Each entry will be clear, concise, and linked to a specific version or commit if possible.
+- This provides a transparent history of the project's evolution.
+
+## 7. General Best Practices
+
+- **Environment Variables**: All sensitive information, like API keys, will be managed through environment variables (e.g., in a `.env` file) and never hard-coded.
+- **Clear Naming**: Variables, functions, and classes will be named descriptively to reflect their purpose.
+- **Docstrings**: All functions and classes will have clear docstrings explaining what they do, their arguments, and what they return.
+- **Code Style**: We will follow PEP 8 style guidelines for Python code.
