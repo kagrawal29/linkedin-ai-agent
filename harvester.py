@@ -22,7 +22,14 @@ class Harvester:
         """
         Translates a Command object into a natural language task and executes it.
         """
-        task = f"Go to linkedin.com, log in if needed, and then {command.engagement_type[0]} {command.post_limit} posts about '{command.topic}'."
+        engagement = command.engagement_type[0]
+        if engagement == "like":
+            task = f"Go to linkedin.com, log in if needed, and then like {command.post_limit} posts about '{command.topic}'."
+        elif engagement == "comment":
+            task = f"Go to linkedin.com, log in if needed, find {command.post_limit} posts about '{command.topic}', and then draft a relevant comment for each."
+        else:
+            # Fallback for any other unimplemented engagement types
+            task = f"Go to linkedin.com, log in if needed, and then {engagement} {command.post_limit} posts about '{command.topic}'."
 
         print(f"Executing Harvester task: {task}")
 

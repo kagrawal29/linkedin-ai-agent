@@ -46,3 +46,38 @@ async def test_harvester_executes_like_command(mock_agent_class):
 
     # Verify the result from the agent is returned.
     assert result == "Task completed successfully."
+
+
+@pytest.mark.asyncio
+@patch('harvester.Agent', new_callable=MagicMock)
+async def test_harvester_executes_comment_command(mock_agent_class):
+    """
+    RED: Tests that the Harvester correctly translates a 'comment' command
+    into a natural language task and executes it with the browser-use Agent.
+    """
+    # Arrange
+    mock_agent_instance = MagicMock()
+    mock_agent_instance.run = AsyncMock(return_value="Comments drafted successfully.")
+    mock_agent_class.return_value = mock_agent_instance
+
+    harvester = Harvester()
+    command = Command(
+            topic="sustainable energy solutions",
+            post_limit=3,
+            engagement_type=["comment"],
+            is_valid=True,
+            feedback="Command is valid and ready for harvesting."
+        )
+
+    # Act
+    result = await harvester.harvest(command)
+
+    # Assert
+    expected_task = "Go to linkedin.com, log in if needed, find 3 posts about 'sustainable energy solutions', and then draft a relevant comment for each."
+
+    mock_agent_class.assert_called_once()
+    called_args, called_kwargs = mock_agent_class.call_args
+    assert called_kwargs.get('task') == expected_task
+    
+    mock_agent_instance.run.assert_awaited_once()
+    assert result == "Comments drafted successfully."
