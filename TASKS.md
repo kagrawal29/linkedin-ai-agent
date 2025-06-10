@@ -35,14 +35,25 @@ This document tracks the project's tasks based on the 1-week sprint plan.
 #### Bonus Task: Interpreter UI
 - [x] **Implement Basic UI**: Create a simple web interface using Flask to allow users to input a prompt and see the structured output from the `PromptInterpreter`.
 
-#### Day 2: Feed Harvester
-- [ ] **Implement `harvester.py`**
-    - [ ] **1. RED**: Write a test in `tests/test_harvester.py` to check browser launch (mocked).
-    - [ ] **2. GREEN**: Write code in `harvester.py` to launch a browser.
-    - [ ] **3. REFACTOR**: Improve browser launch code.
-    - [ ] **4. RED**: Write a test for `scroll_and_extract` using mock HTML data.
-    - [ ] **5. GREEN**: Implement the `scroll_and_extract` method to parse the mock data.
-    - [ ] **6. REFACTOR**: Clean up the harvesting logic.
+#### Day 2: Feed Harvester (with browser-use)
+
+- [x] **1. Integrate `browser-use` Dependency**
+  - [x] Add `browser-use` and `langchain-openai` to `requirements.txt`.
+  - [x] Install the new dependencies into the virtual environment.
+
+- [x] **Phase 1: Core Harvester Implementation (TDD)**
+  - [x] **Task 1: RED** - Write a failing test in `tests/test_harvester.py` that mocks the `browser-use` `Agent` and asserts it's called with a correctly formatted task string.
+  - [x] **Task 2: GREEN** - Implement the minimal `Harvester` class and `harvest` method in `harvester.py` to make the test pass.
+  - [x] **Task 3: REFACTOR** - Clean up the initial implementation, add docstrings, and improve the task-generation logic.
+
+- [ ] **Phase 2: Expanding Functionality and Robustness**
+  - [ ] **Task 4: TDD** - Add new tests for all other command types (`comment`, `connect`, etc.) and update the `harvest` method to pass them.
+  - [ ] **Task 5: Error Handling** - Implement and test error handling within the `harvest` method to gracefully manage potential failures from the browser agent.
+
+- [ ] **Phase 3: Integration and Finalization**
+  - [ ] **Task 6: Manual E2E Test** - Create and run a temporary script to test the full `Interpreter` -> `Harvester` -> `browser-use` workflow with a live browser.
+  - [ ] **Task 7: Documentation** - Update the `README.md` to document the new `Harvester` module.
+  - [ ] **Task 8: Merge** - Commit all changes to the `feature/harvester` branch and merge it into `master`.
 
 #### Day 3: Filtering Engine & Logging Stub
 - [ ] **Implement `filter_engine.py`**

@@ -20,7 +20,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased] - 2025-06-10
 
 ### Added
 - **Prompt Interpreter**: Implemented the `PromptInterpreter` class, which uses the OpenAI GPT-4 API to parse natural language prompts into structured `Command` objects. The implementation follows a strict TDD cycle and includes robust error handling and secure API key management via a `.env` file.
@@ -33,3 +33,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `pyproject.toml` to make the project installable for testing.
 - `.gitignore` and `requirements.txt` for environment setup.
 - Virtual environment `venv` created and dependencies installed.
+- `pytest-asyncio` to `requirements.txt` for enabling asynchronous test functions.
+- `pytest-dotenv` to `requirements.txt` for automatic loading of `.env` file variables during tests.
+
+### Changed
+- **Testing Framework**:
+    - Successfully configured the test environment to support `async def` test functions using `pytest-asyncio`.
+    - Ensured API keys (e.g., `OPENAI_API_KEY`) are correctly loaded during test runs via `.env` and `pytest-dotenv`.
+- **Harvester Module & Tests**:
+    - Updated `tests/test_harvester.py`:
+        - Aligned `Command` object instantiation with its Pydantic model definition, resolving validation errors.
+        - Ensured `test_harvester_executes_like_command` now passes, verifying basic async operation and mocking.
+    - Updated `harvester.py`:
+        - Modified the `harvest` method to correctly use attributes from the `Command` model (`engagement_type`, `post_limit`) when constructing the natural language task string for the browser agent.
+- **Environment Configuration**:
+    - Standardized `OPENAI_API_KEY` naming in `.env` to all uppercase for compatibility with the OpenAI client library.

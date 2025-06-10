@@ -4,6 +4,10 @@ pydantic
 python-dotenv
 PyYAML
 pytest
+pytest-asyncio
+pytest-dotenv
 Flask
+browser-use
+langchain-openai
 # For Phase-2 Streamlit dashboard (optional)
 # streamlit

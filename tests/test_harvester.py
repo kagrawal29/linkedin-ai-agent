@@ -1,29 +1,48 @@
+# tests/test_harvester.py
+
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, AsyncMock
 
-# This import will fail initially, which is expected for the RED step.
+# This import will fail as harvester.py is not yet implemented.
 from harvester import Harvester
+from interpreter import Command
 
-def test_harvester_initialization_and_login(mocker):
+@pytest.mark.asyncio
+@patch('harvester.Agent', new_callable=MagicMock)
+async def test_harvester_executes_like_command(mock_agent_class):
     """
-    RED: Tests that the Harvester class initializes and calls the necessary
-    Playwright methods to launch a browser and log in.
+    RED: Tests that the Harvester correctly translates a 'like' command
+    into a natural language task and executes it with the browser-use Agent.
     """
-    # 1. Setup: Mock the entire Playwright sync_api context
-    mock_playwright_context = MagicMock()
-    mock_browser = MagicMock()
-    mock_page = MagicMock()
+    # Arrange
+    # Mock the agent's async `run` method to avoid actual browser interaction.
+    mock_agent_instance = MagicMock()
+    mock_agent_instance.run = AsyncMock(return_value="Task completed successfully.")
+    mock_agent_class.return_value = mock_agent_instance
 
-    # Arrange the mock returns
-    mocker.patch('playwright.sync_api.sync_playwright', return_value=mock_playwright_context)
-    mock_playwright_context.__enter__.return_value.chromium.launch.return_value = mock_browser
-    mock_browser.new_page.return_value = mock_page
-
-    # 2. Execution: Instantiate the Harvester
     harvester = Harvester()
-    harvester.login()
+    command = Command(
+            topic="AI in healthcare",
+            post_limit=5,
+            engagement_type=["like"],
+            is_valid=True,
+            feedback="Command is valid and ready for harvesting."
+        )
 
-    # 3. Assertion: Verify that the key methods were called
-    mock_playwright_context.__enter__.return_value.chromium.launch.assert_called_once_with(headless=False)
-    mock_browser.new_page.assert_called_once()
-    mock_page.goto.assert_called_once_with("https://www.linkedin.com/feed/")
+    # Act
+    # The harvest method will be async in the new implementation.
+    result = await harvester.harvest(command)
+
+    # Assert
+    expected_task = "Go to linkedin.com, log in if needed, and then like 5 posts about 'AI in healthcare'."
+
+    # Verify that the Agent class was instantiated correctly.
+    mock_agent_class.assert_called_once()
+    called_args, called_kwargs = mock_agent_class.call_args
+    assert called_kwargs.get('task') == expected_task
+    
+    # Verify the agent's `run` method was called.
+    mock_agent_instance.run.assert_awaited_once()
+
+    # Verify the result from the agent is returned.
+    assert result == "Task completed successfully."
