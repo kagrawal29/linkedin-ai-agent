@@ -27,6 +27,9 @@ class Harvester:
             task = f"Go to linkedin.com, log in if needed, and then like {command.post_limit} posts about '{command.topic}'."
         elif engagement == "comment":
             task = f"Go to linkedin.com, log in if needed, find {command.post_limit} posts about '{command.topic}', and then draft a relevant comment for each."
+        elif engagement == "connect":
+            # For 'connect', topic describes the person, post_limit is number of connections
+            task = f"Go to linkedin.com, log in if needed, find {command.post_limit} people who are '{command.topic}', and then send connection requests."
         else:
             # Fallback for any other unimplemented engagement types
             task = f"Go to linkedin.com, log in if needed, and then {engagement} {command.post_limit} posts about '{command.topic}'."

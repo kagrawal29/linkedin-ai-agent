@@ -81,3 +81,41 @@ async def test_harvester_executes_comment_command(mock_agent_class):
     
     mock_agent_instance.run.assert_awaited_once()
     assert result == "Comments drafted successfully."
+
+
+@pytest.mark.asyncio
+@patch('harvester.Agent', new_callable=MagicMock)
+async def test_harvester_executes_connect_command(mock_agent_class):
+    """
+    RED: Tests that the Harvester correctly translates a 'connect' command
+    into a natural language task and executes it with the browser-use Agent.
+    """
+    # Arrange
+    mock_agent_instance = MagicMock()
+    mock_agent_instance.run = AsyncMock(return_value="Connection requests sent.")
+    mock_agent_class.return_value = mock_agent_instance
+
+    harvester = Harvester()
+    command = Command(
+            topic="Product Managers in tech",  # Topic might represent the role/industry to connect with
+            post_limit=2,  # Using post_limit to mean number of connections for now
+            engagement_type=["connect"],
+            is_valid=True,
+            feedback="Command is valid and ready for harvesting."
+        )
+
+    # Act
+    result = await harvester.harvest(command)
+
+    # Assert
+    # For 'connect', the task is more about finding people than posts.
+    # The 'topic' could be interpreted as criteria for people search.
+    # The 'post_limit' could be interpreted as the number of connection requests.
+    expected_task = "Go to linkedin.com, log in if needed, find 2 people who are 'Product Managers in tech', and then send connection requests."
+
+    mock_agent_class.assert_called_once()
+    called_args, called_kwargs = mock_agent_class.call_args
+    assert called_kwargs.get('task') == expected_task
+    
+    mock_agent_instance.run.assert_awaited_once()
+    assert result == "Connection requests sent."
