@@ -47,5 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         - Ensured `test_harvester_executes_like_command` now passes, verifying basic async operation and mocking.
     - Updated `harvester.py`:
         - Modified the `harvest` method to correctly use attributes from the `Command` model (`engagement_type`, `post_limit`) when constructing the natural language task string for the browser agent.
+        - Implemented support for "comment" engagement type in `Harvester.harvest`, including a dedicated test case (`test_harvester_executes_comment_command`).
+        - Implemented support for "connect" engagement type in `Harvester.harvest`, including a dedicated test case (`test_harvester_executes_connect_command`).
 - **Environment Configuration**:
     - Standardized `OPENAI_API_KEY` naming in `.env` to all uppercase for compatibility with the OpenAI client library.
