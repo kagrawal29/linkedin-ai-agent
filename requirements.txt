@@ -1,6 +1,7 @@
-python-dotenv
 openai
 playwright
+pydantic
+python-dotenv
 PyYAML
 pytest
 # For Phase-2 Streamlit dashboard (optional)

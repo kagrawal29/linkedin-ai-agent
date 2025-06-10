@@ -24,13 +24,16 @@ This document tracks the project's tasks based on the 1-week sprint plan.
 - [x] Architect the System: Populate all Python modules with high-level, plain English comments.
 - [x] Setup `tests/` directory for Test-Driven Development.
 
-- [ ] **Implement `interpreter.py`**
-    - [ ] **1. RED**: Write a failing test for `parse_prompt` in `tests/test_interpreter.py` for a simple, clear prompt.
-    - [ ] **2. GREEN**: Write the simplest code in `interpreter.py` to make the test pass.
-    - [ ] **3. REFACTOR**: Improve the `parse_prompt` function.
-    - [ ] **4. RED**: Write a failing test for handling ambiguous prompts.
-    - [ ] **5. GREEN**: Add logic to `parse_prompt` to handle ambiguity.
-    - [ ] **6. REFACTOR**: Improve the ambiguity-handling code.
+- [x] **Implement `interpreter.py`**
+    - [x] **1. RED**: Write a failing test for `parse_prompt` in `tests/test_interpreter.py` for a simple, clear prompt.
+    - [x] **2. GREEN**: Write the simplest code in `interpreter.py` to make the test pass.
+    - [x] **3. REFACTOR**: Improve the `parse_prompt` function.
+    - [x] **4. RED**: Write a failing test for handling ambiguous prompts.
+    - [x] **5. GREEN**: Add logic to `parse_prompt` to handle ambiguity.
+    - [x] **6. REFACTOR**: Improve the ambiguity-handling code.
+
+#### Bonus Task: Interpreter UI
+- [ ] **Implement Basic UI**: Create a simple web interface using Flask and the 21st Dev MCP to allow users to input a prompt and see the structured output from the `PromptInterpreter`.
 
 #### Day 2: Feed Harvester
 - [ ] **Implement `harvester.py`**
@@ -88,4 +91,5 @@ This document tracks the project's tasks based on the 1-week sprint plan.
 - [ ] **Error Handling**: Go through each module and add `try...except` blocks for anticipated issues (e.g., network errors, parsing failures).
 - [ ] **Unit Test Coverage**: Review test coverage and add more unit tests for edge cases.
 - [ ] **Update `README.md`**: Add final usage instructions, a guide on how to run the agent, and a description of the configuration files.
+
 - [ ] **Final Code Review**: Read through the entire codebase to ensure it meets the standards defined in `WINDSURF_RULES.md`.

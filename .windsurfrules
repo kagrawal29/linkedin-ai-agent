@@ -19,7 +19,7 @@ The project follows a modular structure, with each file having a single, clear r
 Every new feature will be built following the **Red-Green-Refactor** cycle.
 
 1.  **RED**: Before writing any implementation code, we will first write an automated test for the new feature in the corresponding `tests/test_*.py` file. This test will initially fail, as the feature does not yet exist.
-2.  **GREEN**: We will then write the simplest, most minimal code required to actually implement the feature and make the test pass. The goal here is not perfection, but a working state.
+2.  **GREEN**: We will then write the simplest, most minimal code required to actually implement the feature to make the test pass. The goal here is not perfection, but a working state, At the same time, we don't want to cheat and just skip the implementation to make the test pass.
 3.  **REFACTOR**: With a passing test as our safety net, we will clean up and improve the implementation code, making it more efficient and readable, while ensuring the test continues to pass.
 
 This cycle will be repeated for every piece of functionality.
