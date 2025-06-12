@@ -27,7 +27,12 @@ async def test_harvester_executes_natural_language_prompt(mock_agent_class):
 
     # Assert
     # Verify that the Agent class was instantiated correctly
-    mock_agent_class.assert_called_once_with(task=prompt)
+    mock_agent_class.assert_called_once()
+    call_args = mock_agent_class.call_args
+    assert call_args[1]['llm'] is not None  # LLM should be passed
+    assert call_args[1]['browser_config'] is not None  # Browser config should be passed
+    assert 'user_data_dir' in call_args[1]['browser_config']  # Should have persistent data dir
+    assert prompt in call_args[1]['task']  # Task should contain original prompt
     
     # Verify the agent's run method was called
     mock_agent_instance.run.assert_awaited_once()
@@ -54,7 +59,11 @@ async def test_harvester_handles_complex_prompts(mock_agent_class):
     result = await harvester.harvest(complex_prompt)
 
     # Assert
-    mock_agent_class.assert_called_once_with(task=complex_prompt)
+    mock_agent_class.assert_called_once()
+    call_args = mock_agent_class.call_args
+    assert call_args[1]['browser_config']['headless'] is False  # Should be visible for login
+    assert complex_prompt in call_args[1]['task']
+    
     mock_agent_instance.run.assert_awaited_once()
     assert result == "Complex task completed."
 
@@ -109,7 +118,11 @@ async def test_harvester_handles_post_fetching_prompts(mock_agent_class):
     result = await harvester.harvest(fetch_prompt)
 
     # Assert
-    mock_agent_class.assert_called_once_with(task=fetch_prompt)
+    mock_agent_class.assert_called_once()
+    call_args = mock_agent_class.call_args
+    assert 'LinkedIn.com' in call_args[1]['task']  # Should include LinkedIn navigation
+    assert 'logged in' in call_args[1]['task']  # Should include login instructions
+    
     mock_agent_instance.run.assert_awaited_once()
 
     # If result contains structured data, it should be parsed into FetchedPost objects

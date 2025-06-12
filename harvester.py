@@ -1,6 +1,8 @@
 # harvester.py
 
 import asyncio
+import os
+from pathlib import Path
 from browser_use import Agent
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
@@ -25,8 +27,22 @@ class Harvester:
     """
     
     def __init__(self):
-        """Initialize the Harvester with an LLM for the browser-use Agent."""
+        """Initialize the Harvester with an LLM and persistent browser config."""
         self.llm = ChatOpenAI(model="gpt-4o", temperature=0)
+        
+        # Set up persistent browser session directory
+        self.browser_data_dir = Path.home() / ".linkedin_ai_agent" / "browser_data"
+        self.browser_data_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Browser configuration for persistent sessions
+        self.browser_config = {
+            "headless": False,  # Keep visible for debugging and manual login
+            "user_data_dir": str(self.browser_data_dir),
+            "disable_dev_shm_usage": True,
+            "no_sandbox": True,
+            "disable_web_security": True,
+            "disable_features": "VizDisplayCompositor"
+        }
     
     async def harvest(self, prompt: Optional[str]) -> Union[List[FetchedPost], str, List[Any]]:
         """
@@ -49,10 +65,41 @@ class Harvester:
         # Clean the prompt
         clean_prompt = prompt.strip()
         
-        # Create and execute browser-use Agent with the prompt
-        agent = Agent(llm=self.llm, task=clean_prompt)
+        # Enhanced prompt with LinkedIn-specific guidance
+        enhanced_prompt = f"""
+        TASK: {clean_prompt}
+        
+        INSTRUCTIONS:
+        1. Navigate to LinkedIn.com first
+        2. If not logged in, PAUSE and wait for manual login
+        3. Once logged in, proceed with the task
+        4. Focus on LinkedIn content and interactions only
+        5. Return structured data when possible
+        """
+        
+        # Create browser-use Agent with persistent session
+        agent = Agent(
+            llm=self.llm, 
+            task=enhanced_prompt,
+            browser_config=self.browser_config
+        )
+        
         result = await agent.run()
         
-        # Return the agent's result directly
-        # The agent can return various types (string, list, etc.)
         return result
+    
+    def get_browser_data_path(self) -> str:
+        """Get the path to the persistent browser data directory."""
+        return str(self.browser_data_dir)
+    
+    def clear_browser_data(self) -> None:
+        """Clear saved browser data (logout from all sessions)."""
+        import shutil
+        if self.browser_data_dir.exists():
+            shutil.rmtree(self.browser_data_dir)
+            self.browser_data_dir.mkdir(parents=True, exist_ok=True)
+            print("✅ Browser data cleared. You'll need to log in again.")
+    
+    def is_browser_data_present(self) -> bool:
+        """Check if browser data (likely including login state) exists."""
+        return self.browser_data_dir.exists() and any(self.browser_data_dir.iterdir())

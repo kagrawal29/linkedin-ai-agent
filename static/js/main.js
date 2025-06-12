@@ -19,8 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
         messagesOutput.innerHTML = '';
         postsOutput.innerHTML = '';
 
+        // Show loading indicator
+        const loadingElement = document.createElement('p');
+        loadingElement.className = 'loading-message';
+        loadingElement.textContent = '🤖 AI Agent is processing your request...';
+        messagesOutput.appendChild(loadingElement);
+
         try {
-            const response = await fetch('/api/process_prompt_and_fetch', {
+            const response = await fetch('/api/process', {  // Updated endpoint
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -30,67 +36,110 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
 
-            // Display command output
-            if (data.command) {
-                commandOutputDisplay.textContent = JSON.stringify(data.command, null, 2);
+            // Remove loading indicator
+            messagesOutput.removeChild(loadingElement);
+
+            // Display enhanced prompt and results
+            if (data.user_prompt && data.enhanced_prompt) {
+                const promptInfo = {
+                    user_prompt: data.user_prompt,
+                    enhanced_prompt: data.enhanced_prompt,
+                    status: response.ok ? 'success' : 'error'
+                };
+                commandOutputDisplay.textContent = JSON.stringify(promptInfo, null, 2);
             } else {
-                commandOutputDisplay.textContent = JSON.stringify(data, null, 2); // Fallback for old structure or errors
+                commandOutputDisplay.textContent = JSON.stringify(data, null, 2);
             }
 
             // Display error messages
             if (data.error) {
                 const errorElement = document.createElement('p');
-                errorElement.className = 'error-message'; // For styling
-                errorElement.textContent = data.error;
+                errorElement.className = 'error-message';
+                errorElement.textContent = `❌ Error: ${data.error}`;
                 messagesOutput.appendChild(errorElement);
-            } else if (data.harvester_message) { // Display harvester messages if no error
-                const messageElement = document.createElement('p');
-                messageElement.className = 'info-message'; // For styling
-                messageElement.textContent = data.harvester_message;
-                messagesOutput.appendChild(messageElement);
-            }
-
-            // Display fetched posts
-            if (data.posts_data && Array.isArray(data.posts_data)) {
-                if (data.posts_data.length === 0) {
-                    postsOutput.innerHTML = '<p>No posts found or returned.</p>';
+            } else if (data.results) {
+                // Display results - could be string or structured data
+                const successElement = document.createElement('p');
+                successElement.className = 'success-message';
+                
+                if (typeof data.results === 'string') {
+                    successElement.textContent = `✅ ${data.results}`;
+                    messagesOutput.appendChild(successElement);
+                } else if (Array.isArray(data.results)) {
+                    // Handle structured post data
+                    successElement.textContent = `✅ Found ${data.results.length} results:`;
+                    messagesOutput.appendChild(successElement);
+                    
+                    displayPosts(data.results);
                 } else {
-                    data.posts_data.forEach(post => {
-                        const postElement = document.createElement('div');
-                        postElement.className = 'post-item'; // For styling
-                        // Sanitize content before injecting as HTML if it comes from user input or external sources
-                        // For now, assuming data from our backend is safe or will be simple text.
-                        postElement.innerHTML = `
-                            <p>
-                                <strong>Author:</strong> 
-                                ${post.author_url ? `<a href="${post.author_url}" target="_blank">${post.author_name || 'N/A'}</a>` : (post.author_name || 'N/A')}
-                                (${post.author_headline || 'N/A'})
-                            </p>
-                            <p><strong>Content:</strong> ${post.content_text || 'No content available.'}</p>
-                            <p>${post.post_url ? `<a href="${post.post_url}" target="_blank">View Post on LinkedIn</a>` : 'No post URL'}</p>
-                            <p>
-                                Likes: ${post.likes_count !== null ? post.likes_count : 'N/A'} |
-                                Comments: ${post.comments_count !== null ? post.comments_count : 'N/A'} |
-                                Reposts: ${post.reposts_count !== null ? post.reposts_count : 'N/A'} |
-                                Views: ${post.views_count !== null ? post.views_count : 'N/A'}
-                            </p>
-                            <p><small>Posted: ${post.posted_timestamp_str || 'N/A'}</small></p>
-                        `;
-                        postsOutput.appendChild(postElement);
-                        postsOutput.appendChild(document.createElement('hr'));
-                    });
+                    successElement.textContent = `✅ Task completed successfully`;
+                    messagesOutput.appendChild(successElement);
+                    
+                    // Display any structured data
+                    const dataElement = document.createElement('pre');
+                    dataElement.className = 'result-data';
+                    dataElement.textContent = JSON.stringify(data.results, null, 2);
+                    postsOutput.appendChild(dataElement);
                 }
-            } else if (data.command && data.command.engagement_type && data.command.engagement_type.includes('fetch_posts') && !data.error) {
-                // If it was a fetch_posts command but posts_data is null/undefined and no error, imply no posts found
-                postsOutput.innerHTML = '<p>No posts data received, though it was a fetch command.</p>';
             }
 
         } catch (error) {
+            // Remove loading indicator if still present
+            if (messagesOutput.contains(loadingElement)) {
+                messagesOutput.removeChild(loadingElement);
+            }
+            
             commandOutputDisplay.textContent = `An error occurred: ${error.message}`;
             const errorElement = document.createElement('p');
             errorElement.className = 'error-message';
-            errorElement.textContent = `Client-side error: ${error.message}`;
+            errorElement.textContent = `❌ Client-side error: ${error.message}`;
             messagesOutput.appendChild(errorElement);
         }
     });
+
+    // Helper function to display posts
+    function displayPosts(posts) {
+        if (!posts || posts.length === 0) {
+            postsOutput.innerHTML = '<p>No posts found or returned.</p>';
+            return;
+        }
+
+        posts.forEach(post => {
+            const postElement = document.createElement('div');
+            postElement.className = 'post-item';
+            
+            // Handle both structured posts and simple objects
+            if (post.author_name || post.content_text) {
+                // Structured LinkedIn post data
+                postElement.innerHTML = `
+                    <div class="post-header">
+                        <strong>Author:</strong> 
+                        ${post.author_url ? `<a href="${post.author_url}" target="_blank">${post.author_name || 'N/A'}</a>` : (post.author_name || 'N/A')}
+                        ${post.author_headline ? `<br><small>${post.author_headline}</small>` : ''}
+                    </div>
+                    <div class="post-content">
+                        <strong>Content:</strong> ${post.content_text || 'No content available.'}
+                    </div>
+                    <div class="post-link">
+                        ${post.post_url ? `<a href="${post.post_url}" target="_blank">🔗 View Post on LinkedIn</a>` : ''}
+                    </div>
+                    <div class="post-stats">
+                        👍 ${post.likes_count || 0} | 
+                        💬 ${post.comments_count || 0} | 
+                        🔄 ${post.reposts_count || 0} | 
+                        👁️ ${post.views_count || 0}
+                    </div>
+                    <div class="post-timestamp">
+                        <small>📅 Posted: ${post.posted_timestamp_str || 'N/A'}</small>
+                    </div>
+                `;
+            } else {
+                // Simple object or string
+                postElement.innerHTML = `<pre>${JSON.stringify(post, null, 2)}</pre>`;
+            }
+            
+            postsOutput.appendChild(postElement);
+            postsOutput.appendChild(document.createElement('hr'));
+        });
+    }
 });

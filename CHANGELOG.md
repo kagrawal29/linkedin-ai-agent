@@ -48,6 +48,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Root Cause**: Tests were patching `@patch('app.Agent')` but Agent is created inside `Harvester.__init__()`
   - **Solution**: Fixed mocking to `@patch('harvester.Agent')` to patch where Agent is actually instantiated
   - **Impact**: All 9 Flask app tests now pass without unwanted browser launches, TDD workflow can continue safely
+- **🔑 CRITICAL: Added Persistent Browser Sessions for LinkedIn Login** (2025-06-12)
+  - **Issue**: Browser opens LinkedIn but user not logged in → Agent gets stuck waiting
+  - **Root Cause**: Each browser session starts fresh without saved login state
+  - **Solution**: Implemented persistent user data directory (`~/.linkedin_ai_agent/browser_data/`)
+  - **Impact**: 
+    - First run: User logs in manually, session is saved automatically
+    - Future runs: Browser loads saved session → Already logged in
+    - Added helper methods: `clear_browser_data()`, `is_browser_data_present()`
+    - Enhanced prompts with LinkedIn-specific navigation instructions
 
 ### Added
 - **Architectural Transition Plan**: Comprehensive 4-phase plan in `TASKS.md`
