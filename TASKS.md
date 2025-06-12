@@ -54,20 +54,125 @@ python launcher.py → Web UI opens → Schedule automation → Done
   - Cron-style scheduling (daily, weekly, custom)
   - Error handling and retries
   - Execution logging
+- [ ] **1.4**: LinkedIn Action Templates
+  - Transform PromptTransformer from "guideline adder" to "intelligent LinkedIn action classifier & template engine"
+  - Core LinkedIn action templates (9)
+  - Template-driven prompts with Target Description knowledge integration
 
 #### **Week 2: Integration & Polish**
-- [ ] **1.4**: Enhanced Chrome CDP Manager
+- [ ] **1.5**: Enhanced Chrome CDP Manager
   - Automatic Chrome startup with correct flags
   - Connection retry logic and health checks
   - Session validation and recovery
   - Multi-tab management
-- [ ] **1.5**: Schedule execution engine
+- [ ] **1.6**: Schedule execution engine
   - Connect to persistent Chrome session
   - Execute browser-use automation
   - Log results and handle errors
   - Prevent concurrent job execution
 
 **Success Criteria:** Developer can run `python launcher.py`, schedule LinkedIn automation, and it executes automatically
+
+---
+
+### 🎯 **Phase 1.3: LinkedIn Action Templates** - **CURRENT FOCUS**
+
+**🎯 OBJECTIVE**: Transform PromptTransformer from "guideline adder" to "intelligent LinkedIn action classifier & template engine"
+
+**🔬 RESEARCH INSIGHTS:**
+- Browser-use performs best with numbered, step-by-step instructions.
+- LinkedIn actions can be classified into 7-9 core templates.
+- Providing **Selector Hints & Target Descriptors** is more resilient to UI changes than hardcoded selectors.
+- Template-driven prompts with descriptive hints achieve higher success rates with lower token costs.
+
+**📋 CORE LINKEDIN ACTION TEMPLATES:**
+1. **Post Engagement** - "Like 3 posts about AI"
+2. **Comment on Post** - "Comment 'Great insights!' on latest post by Satya Nadella"  
+3. **Create Post** - "Post update: 'Excited about our new product...'"
+4. **Search Content** - "Find 5 posts about generative AI published this week"
+5. **Visit Profile** - "Open Sundar Pichai's profile"
+6. **Connect/Follow** - "Connect with all Google PMs named Alex"
+7. **Message** - "Send 'Thanks for connecting!' to John Smith"
+8. **Data Extract** - "Export job titles of commenters on this post"
+9. **Feed Collection** - "Scroll my feed and summarise top 10 posts"
+
+**📋 TDD IMPLEMENTATION PLAN:**
+
+#### **🔄 CYCLE 1: Template Engine Foundation** (RED-GREEN-REFACTOR)
+- [ ] **RED Phase**: Create failing tests for `PromptTemplateEngine` class.
+  - Test intent detection from natural language.
+  - Test parameter extraction (numbers, names, keywords).
+  - Test template selection and rendering.
+- [ ] **GREEN Phase**: Implement minimal template engine.
+  - Basic intent classification (keyword matching).
+  - Simple parameter extraction with regex.
+  - Template rendering with parameter substitution.
+- [ ] **REFACTOR Phase**: Enhance robustness.
+  - Improve intent detection with fuzzy matching.
+  - Add comprehensive parameter validation.
+  - Optimize template matching performance.
+
+#### **🔄 CYCLE 2: LinkedIn Template Database** (RED-GREEN-REFACTOR)  
+- [ ] **RED Phase**: Create failing tests for all 9 LinkedIn action templates.
+  - Test each template renders correct step-by-step instructions.
+  - Test **Selector Hints & Target Descriptors** are injected correctly.
+  - Test parameter validation for each template.
+- [ ] **GREEN Phase**: Implement template definitions.
+  - Create YAML/JSON template configuration files.
+  - Add LinkedIn **Selector Hints & Target Descriptors** for each action.
+  - Implement template-specific parameter extraction.
+- [ ] **REFACTOR Phase**: Optimize templates with current LinkedIn UI knowledge.
+  - Add fallback hint chains for robustness.
+  - Include rate limiting instructions.
+  - Add error handling steps to each template.
+
+#### **🔄 CYCLE 3: PromptTransformer Integration** (RED-GREEN-REFACTOR)
+- [ ] **RED Phase**: Create failing tests for enhanced PromptTransformer.
+  - Test template detection and rendering integration.
+  - Test fallback to generic enhancement when no template matches.
+  - Test end-to-end prompt transformation workflow.
+- [ ] **GREEN Phase**: Integrate template engine with existing PromptTransformer.
+  - Add template detection to `enhance()` method.
+  - Preserve existing generic enhancement as fallback.
+  - Pass rendered templates to browser-use as instructions.
+- [ ] **REFACTOR Phase**: Optimize integration.
+  - Add logging for template selection and parameters.
+  - Add configuration options for template vs generic mode.
+  - Optimize prompt token consumption.
+
+#### **🔄 CYCLE 4: Target Description Knowledge & Analytics** (RED-GREEN-REFACTOR)
+- [ ] **RED Phase**: Create failing tests for **Selector Hint database** and analytics.
+  - Test **Selector Hint database** loading and fallback logic.
+  - Test template success tracking and analytics.
+  - Test automatic UI change detection alerts.
+- [ ] **GREEN Phase**: Add LinkedIn **Selector Hint database**.
+  - Comprehensive LinkedIn target descriptions and hint mappings.
+  - Fallback chains for critical UI elements.
+  - Template execution success tracking.
+- [ ] **REFACTOR Phase**: Add analytics and maintenance tools.
+  - Template performance dashboard.
+  - Automatic hint health checks.
+  - **UI change** detection and alerts.
+
+**🎯 DELIVERABLES:**
+- `PromptTemplateEngine` class with 9 LinkedIn templates.
+- Enhanced `PromptTransformer` with template detection.
+- LinkedIn **Selector Hint database** (YAML/JSON configuration).
+- Template analytics and success tracking system.
+- Comprehensive test coverage for all templates and integrations.
+
+**SUCCESS METRICS:**
+- 95%+ intent classification accuracy for common LinkedIn tasks.
+- 50%+ reduction in browser-use token consumption.
+- 40%+ improvement in task success rate.
+- Template-driven prompts execute deterministically.
+- Maintainable **Selector Hint database** for easy LinkedIn UI updates.
+
+**EXPECTED IMPACT:**
+- **Faster execution** - Fewer trial-and-error loops with deterministic steps.
+- **Lower costs** - Reduced token consumption with shorter, structured prompts.
+- **Higher reliability** - Proven step-by-step plans instead of LLM improvisation.
+- **Better maintenance** - Centralized **Target Description knowledge** for easy LinkedIn UI updates.
 
 ---
 
