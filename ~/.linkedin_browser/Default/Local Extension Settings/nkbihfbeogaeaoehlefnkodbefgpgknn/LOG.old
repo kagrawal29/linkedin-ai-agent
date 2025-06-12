@@ -1,0 +1,23 @@
+2025/06/12-18:42:24.882 ca5d5 Reusing MANIFEST /Users/kshitiz/CascadeProjects/linkedin-ai-agent/~/.linkedin_browser/Default/Local Extension Settings/nkbihfbeogaeaoehlefnkodbefgpgknn/MANIFEST-000001
+2025/06/12-18:42:24.882 ca5d5 Recovering log #191
+2025/06/12-18:42:24.893 ca5d5 Level-0 table #194: started
+2025/06/12-18:42:24.905 ca5d5 Level-0 table #194: 2084908 bytes OK
+2025/06/12-18:42:24.907 ca5d5 Delete type=0 #191
+2025/06/12-18:42:36.051 ca5d7 Level-0 table #197: started
+2025/06/12-18:42:36.066 ca5d7 Level-0 table #197: 2084770 bytes OK
+2025/06/12-18:42:36.070 ca5d7 Delete type=0 #195
+2025/06/12-18:42:36.073 ca5d7 Compacting 4@0 + 1@1 files
+2025/06/12-18:42:36.100 ca5d7 Generated table #198@0: 1 keys, 1042496 bytes
+2025/06/12-18:42:36.100 ca5d7 Compacted 4@0 + 1@1 files => 1042496 bytes
+2025/06/12-18:42:36.102 ca5d7 compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/06/12-18:42:36.102 ca5d7 Delete type=2 #188
+2025/06/12-18:42:36.102 ca5d7 Delete type=2 #197
+2025/06/12-18:42:36.102 ca5d7 Delete type=2 #194
+2025/06/12-18:42:36.102 ca5d7 Delete type=2 #190
+2025/06/12-18:42:36.102 ca5d7 Delete type=2 #192
+2025/06/12-18:43:01.660 ca5d7 Level-0 table #200: started
+2025/06/12-18:43:01.687 ca5d7 Level-0 table #200: 2084934 bytes OK
+2025/06/12-18:43:01.700 ca5d7 Delete type=0 #196
+2025/06/12-18:43:21.086 ca5d7 Level-0 table #202: started
+2025/06/12-18:43:21.100 ca5d7 Level-0 table #202: 2084582 bytes OK
+2025/06/12-18:43:21.103 ca5d7 Delete type=0 #199
