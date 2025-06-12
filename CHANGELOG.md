@@ -72,6 +72,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Development Methodology**: Strict TDD (RED-GREEN-REFACTOR) maintained throughout transition
 - **Architecture Vision**: From engagement-type-limited system to general-purpose AI agent
 
+### Added - Phase 3: Debugging and Visibility Enhancements (2024-12-19)
+
+#### ✅ TDD Cycle Completed: Enhanced UI Debugging Capabilities
+
+**New Features:**
+- **Transformed Prompt Display**: Flask API now returns both `original_prompt` and `transformed_prompt` for full transparency
+- **Agent Action Logging Structure**: Added framework for capturing and displaying agent logs in real-time
+- **Structured Post Data Extraction**: Enhanced API to properly extract and serialize LinkedIn post data from agent results
+- **Enhanced Error Handling**: Improved error responses with debugging information included
+
+**Frontend Improvements:**
+- Added dedicated UI sections for original vs enhanced prompt comparison
+- Implemented agent logs display area with structured logging format
+- Enhanced post display cards with professional styling and proper data extraction
+- Added visual indicators for enhanced prompts (green border highlighting)
+
+**API Enhancements:**
+- Updated `/api/process` endpoint with comprehensive debugging response format:
+  - `original_prompt`: User's input exactly as entered
+  - `transformed_prompt`: Enhanced prompt with LinkedIn guidelines
+  - `extracted_posts`: Clean, serializable post data structures
+  - `agent_logs`: Framework for real-time agent action logging
+  - `status`, `message`, and error handling improvements
+
+**CSS & Styling:**
+- Added comprehensive styling for all new debugging UI elements
+- Implemented dark theme consistency across prompt displays and agent logs
+- Enhanced post cards with hover effects and improved readability
+- Added color-coded status indicators for different types of logs and messages
+
+**Technical Implementation:**
+- Fixed Flask async compatibility issues by using `asyncio.run()` 
+- Implemented proper JSON serialization for complex data structures
+- Added HTML escaping for security and proper display
+- Created comprehensive test suite for all debugging features (6 new tests)
+
+**Test Coverage:**
+- `TestTransformedPromptDisplay`: Tests for API and UI prompt display features
+- `TestAgentActionLogging`: Tests for agent logs capture and display structure  
+- `TestStructuredDataExtraction`: Tests for post data extraction and serialization
+- All tests following strict TDD red-green-refactor methodology
+
+This enhancement significantly improves the developer and user experience by providing full visibility into:
+1. How prompts are transformed and enhanced
+2. What actions the AI agent is taking step-by-step  
+3. What structured data is being extracted from LinkedIn
+4. Clear error handling and status reporting
+
+**Files Modified:**
+- `app.py`: Enhanced `/api/process` endpoint with debugging response format
+- `templates/index.html`: Added UI sections for prompts and agent logs
+- `static/js/main.js`: Updated JavaScript to handle new API response format
+- `static/css/style.css`: Added comprehensive styling for debugging UI elements
+- `tests/test_app_debugging.py`: Complete test suite for debugging features
+
 ---
 
 ## [0.1.5] - 2024-12-12

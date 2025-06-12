@@ -14,8 +14,24 @@
             <textarea id="prompt-input" placeholder="e.g., Like 10 posts about machine learning"></textarea>
             <button type="submit">Process Prompt</button>
         </form>
+
+        <h2>Prompt Processing</h2>
+        <div class="prompt-section">
+            <h3>Original Prompt</h3>
+            <pre id="original-prompt-display" class="prompt-display"></pre>
+            
+            <h3>Enhanced Prompt</h3>
+            <pre id="transformed-prompt-display" class="prompt-display"></pre>
+        </div>
+
         <h2>Output</h2>
         <pre id="output-display"><code>{}</code></pre>
+
+        <h2>Agent Actions</h2>
+        <div id="agent-logs-display" class="logs-section">
+            <p class="logs-placeholder">Agent actions will appear here during execution...</p>
+        </div>
+
         <h2>Messages</h2>
         <div id="messages-output" class="output-messages"></div>
 
