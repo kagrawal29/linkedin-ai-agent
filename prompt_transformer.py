@@ -7,6 +7,7 @@ that prepares natural language prompts for direct use with browser-use Agent.
 
 from typing import Optional
 import re
+import logging
 
 # Try to import PromptTemplateEngine for advanced template-based enhancement
 try:
@@ -86,24 +87,37 @@ class PromptTransformer:
         Raises:
             ValueError: If prompt is empty or None
         """
+        logging.basicConfig(level=logging.INFO)
+        logger = logging.getLogger(__name__)
+        logger.info(f"enhance_prompt called with: {user_prompt}")
+        
         # Validate input
         if not user_prompt or not user_prompt.strip():
             raise ValueError("Empty prompt not allowed")
         
         # Clean and prepare the input
         clean_prompt = self._clean_prompt(user_prompt.strip())
+        logger.info(f"Cleaned prompt: {clean_prompt}")
         
         # Try template-based enhancement first if enabled
         if self.use_templates and self.template_engine:
+            logger.info("Attempting template-based enhancement...")
             try:
                 template_enhanced = self._try_template_enhancement(clean_prompt)
                 if template_enhanced:
+                    logger.info("Template enhancement succeeded - returning template result")
+                    logger.info(f"Template enhanced prompt: {template_enhanced}")
                     return template_enhanced
+                else:
+                    logger.info("Template enhancement returned None/empty - falling back")
             except Exception as e:
-                print(f"Template enhancement failed: {e}")
-                print("Falling back to generic enhancement.")
+                logger.info(f"Template enhancement failed: {e}")
+                logger.info("Falling back to generic enhancement.")
+        else:
+            logger.info(f"Template enhancement disabled - use_templates: {self.use_templates}, template_engine: {self.template_engine}")
         
         # Fall back to generic enhancement
+        logger.info("Using generic enhancement (_build_enhanced_prompt)")
         enhanced_prompt = self._build_enhanced_prompt(clean_prompt)
         
         return enhanced_prompt
@@ -172,23 +186,130 @@ class PromptTransformer:
         return cleaned
     
     def _build_enhanced_prompt(self, clean_prompt: str) -> str:
-        """Build the enhanced prompt with LinkedIn context and guidelines."""
-        # Create structured enhanced prompt
-        enhanced_sections = [
-            self._linkedin_context,
-            "",  # Empty line for readability
-            f"Task: {clean_prompt}",
-            "",  # Empty line for readability
-            "Important guidelines:",
-        ]
+        """Build enhanced prompt with sophisticated browser automation script generation."""
+        logging.basicConfig(level=logging.INFO)
+        logger = logging.getLogger(__name__)
+
+        # Analyze the prompt for key actions and parameters
+        prompt_lower = clean_prompt.lower()
         
-        # Add safety guidelines as bullet points
+        # Extract key actions
+        actions = []
+        if any(word in prompt_lower for word in ['find', 'search', 'look for']):
+            actions.append('search')
+        if any(word in prompt_lower for word in ['comment', 'reply', 'respond']):
+            actions.append('comment')
+        if any(word in prompt_lower for word in ['like', 'react']):
+            actions.append('like')
+        if any(word in prompt_lower for word in ['connect', 'follow']):
+            actions.append('connect')
+        if any(word in prompt_lower for word in ['post', 'share', 'publish']):
+            actions.append('post')
+        
+        logger.info(f"Detected actions: {actions}")
+
+        # Extract topics/keywords
+        topics = []
+        for topic in ['ai', 'artificial intelligence', 'machine learning', 'ml', 'workflow', 'automation', 'startup', 'tech', 'software engineer', 'google', 'fundraising']:
+            if topic in prompt_lower:
+                topics.append(topic)
+        
+        # Build detailed execution plan
+        base_prompt = f"""You are working on LinkedIn using browser automation. You have specific tasks to complete.
+
+Original Task: {clean_prompt}
+
+DETAILED BROWSER AUTOMATION PLAN:
+"""
+        
+        if 'search' in actions or 'connect' in actions:
+            base_prompt += f"""
+1. SEARCH PHASE:
+   - Navigate to LinkedIn search or People tab
+   - Use search terms: {', '.join(topics) if topics else 'relevant keywords from prompt'}
+   - Apply filters for location, company, job title as needed
+   - Identify target profiles matching the criteria
+   - Take note of profile details, current roles, and recent activity
+"""
+
+        if 'connect' in actions:
+            base_prompt += f"""
+2. CONNECTION PHASE:
+   - Visit each target profile individually
+   - Review their recent posts, experience, and background
+   - Click the "Connect" button
+   - Choose "Add a note" option
+   - Craft personalized connection messages (50-200 characters)
+   - Reference specific work, posts, or shared interests
+   - Send connection requests with personalized notes
+"""
+
+        if 'comment' in actions:
+            # Check if this is a draft-only request
+            is_draft_only = any(phrase in prompt_lower for phrase in ["don't post", "dont post", "draft", "don't submit"])
+            submit_instruction = "Draft comments in comment boxes but DO NOT SUBMIT yet" if is_draft_only else "Submit well-crafted comments"
+            
+            base_prompt += f"""
+2. RESEARCH PHASE:
+   - For each identified post, read the full content carefully
+   - Check the author's profile and background  
+   - Review existing comments to avoid duplication
+   - Research the topic mentioned to provide informed insights
+   - Formulate thoughtful, value-adding comments (100-200 words each)
+
+3. COMMENT COMPOSITION:
+   - Write comments that demonstrate expertise and genuine interest
+   - Include specific insights or questions related to the post content
+   - Reference your own experience or ask thoughtful follow-up questions
+   - Ensure each comment adds unique value to the conversation
+   - {submit_instruction}
+"""
+
+        if 'like' in actions:
+            base_prompt += f"""
+4. ENGAGEMENT PHASE:
+   - Navigate to LinkedIn feed or search for relevant posts
+   - Look for posts containing: {', '.join(topics) if topics else 'specified keywords'}
+   - Scroll through feed to find matching content
+   - Like posts that align with your interests and expertise
+   - Prioritize posts from thought leaders and industry experts
+   - Avoid liking low-quality or controversial content
+"""
+
+        # Add execution guidelines and DOM hints for all prompts
+        base_prompt += f"""
+EXECUTION GUIDELINES:
+- Work methodically through each phase
+- Spend adequate time on research (2-3 minutes per profile/post)
+- Ensure all interactions are professional and value-adding
+- Respect rate limits - take 30-second breaks between actions
+- Maintain authentic, human-like interaction patterns
+- Double-check all text before submitting
+
+SUCCESS METRICS:
+- Find profiles/posts that are genuinely relevant and high-quality
+- Create personalized messages that could generate positive responses
+- Demonstrate subject matter expertise through thoughtful interactions
+- Complete all phases without triggering LinkedIn's spam detection
+
+LinkedIn DOM HINTS:
+- Search box: input[placeholder*="Search"] or [data-test-id="search-keywords-input"]
+- Connect buttons: button[aria-label*="Invite"] or button[data-test-id*="connect"]
+- Like buttons: button[aria-label*="Like"] or button[data-test-id*="like"]
+- Comment boxes: div[contenteditable="true"] or textarea[placeholder*="comment"]
+- Profile links: a[href*="/in/"]
+- Submit buttons: button[type="submit"] or button[aria-label*="Send"]
+
+SAFETY GUIDELINES:
+"""
+        
+        # Add safety guidelines
         for guideline in self._safety_guidelines:
-            enhanced_sections.append(f"- {guideline}")
+            base_prompt += f"- {guideline}\n"
         
-        enhanced_sections.extend([
-            "",  # Empty line for readability
-            "Please execute this task on LinkedIn while adhering to these professional standards."
-        ])
-        
-        return "\n".join(enhanced_sections)
+        base_prompt += """
+Execute this plan step by step, taking time for proper research and thoughtful engagement."""
+
+        logger.info(f"Generated enhanced prompt: {base_prompt}")
+
+        return base_prompt

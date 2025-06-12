@@ -44,7 +44,8 @@ def enhance_prompt():
             return jsonify({'error': 'Empty prompt not allowed'}), 400
         
         # Get template and LLM preferences
-        use_templates = data.get('use_templates', True)
+        # Disable template-based enhancement by default to use sophisticated browser-automation enhancer
+        use_templates = data.get('use_templates', False)
         use_llm = data.get('use_llm', False)
         
         # Transform the prompt immediately
@@ -98,7 +99,8 @@ def process_prompt():
         
         # Get execution preferences
         execute_immediately = data.get('execute_immediately', False)
-        use_templates = data.get('use_templates', True)
+        # Disable template-based enhancement by default to use sophisticated browser-automation enhancer
+        use_templates = data.get('use_templates', False)
         use_llm = data.get('use_llm', False)
         
         # Transform the prompt immediately
