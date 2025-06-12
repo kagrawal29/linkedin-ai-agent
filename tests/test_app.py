@@ -19,7 +19,7 @@ def client():
         yield client
 
 
-@patch('app.Agent')
+@patch('harvester.Agent')  # FIX: Patch where Agent is actually created
 @patch('app.PromptTransformer')
 def test_process_endpoint_with_simple_prompt(mock_transformer_class, mock_agent_class, client):
     """
@@ -51,7 +51,7 @@ def test_process_endpoint_with_simple_prompt(mock_transformer_class, mock_agent_
     assert data['results'] == 'Successfully liked 5 posts about AI'
 
 
-@patch('app.Agent')
+@patch('harvester.Agent')  # FIX: Patch where Agent is actually created
 @patch('app.PromptTransformer')
 def test_process_endpoint_with_complex_prompt(mock_transformer_class, mock_agent_class, client):
     """
@@ -83,7 +83,7 @@ def test_process_endpoint_with_complex_prompt(mock_transformer_class, mock_agent
     assert data['results'] == 'Engaged with 3 AI researchers'
 
 
-@patch('app.Agent')
+@patch('harvester.Agent')  # FIX: Patch where Agent is actually created
 @patch('app.PromptTransformer')
 def test_process_endpoint_with_fetch_posts_prompt(mock_transformer_class, mock_agent_class, client):
     """
@@ -163,10 +163,10 @@ def test_process_endpoint_empty_prompt(client):
     assert response.status_code == 400
     data = json.loads(response.data)
     assert 'error' in data
-    assert 'empty' in data['error'].lower()
+    assert 'required' in data['error'].lower()
 
 
-@patch('app.Agent')
+@patch('harvester.Agent')  # FIX: Patch where Agent is actually created
 @patch('app.PromptTransformer')
 def test_process_endpoint_handles_agent_errors(mock_transformer_class, mock_agent_class, client):
     """

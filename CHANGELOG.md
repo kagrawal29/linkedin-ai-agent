@@ -18,11 +18,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FetchedPost Model**: Structured post data parsing with Pydantic validation
 - **Environment Fixes**: Resolved API key loading and environment variable issues
 
-#### 📋 Phase 1: Architecture Transition (PLANNED)
-- **PromptTransformer**: Replace constrained interpreter with flexible prompt enhancement
-- **Harvester Simplification**: Direct natural language prompt handling (remove Command objects)
-- **Flask App Migration**: Single `/api/process` endpoint with streamlined flow
-- **Test Migration**: Rewrite tests for string-based prompts vs structured commands
+#### 🔄 Phase 1: Architecture Transition (IN PROGRESS)
+- **PromptTransformer**: ✅ Complete RED-GREEN-REFACTOR cycle with full test coverage
+- **Harvester Simplification**: ✅ Direct natural language prompt handling (removed Command objects)
+- **Flask App Migration**: ✅ Single `/api/process` endpoint with streamlined flow
+- **Test Migration**: ✅ All tests rewritten for string-based prompts vs structured commands
+
+### Added
+- **Architectural Transition Plan**: Comprehensive 4-phase plan in `TASKS.md`
+  - Phase 1: Architecture Transition (PromptTransformer)
+  - Phase 2: Enhanced Capabilities & Safety
+  - Phase 3: Testing & Optimization  
+  - Phase 4: Documentation & Deployment
+- **Success Metrics**: Quantifiable goals (50% code reduction, 40% fewer API calls, 70% fewer rate limits)
+- **Rollback Plan**: Safety mechanisms for reverting changes if issues arise
+- **Git Workflow**: Feature branch `feature/prompt-transformer-transition` for transition work
+- **PromptTransformer Module**: New flexible prompt enhancement system replacing constrained interpreter
+- **Simplified Flask App**: New `/api/process` endpoint integrating PromptTransformer + Harvester
+
+### Changed
+- **Development Methodology**: Strict TDD (RED-GREEN-REFACTOR) maintained throughout transition
+- **Architecture Vision**: From engagement-type-limited system to general-purpose AI agent
+- **Harvester Module**: Simplified to accept natural language strings instead of Command objects
+- **Test Strategy**: All tests updated to use proper mocking to prevent unwanted browser automation
+
+### Fixed
+- **🔧 CRITICAL: Prevented Unwanted Browser Automation During Tests** (2025-06-12)
+  - **Issue**: Tests were accidentally launching real browsers and navigating to random websites (x.com, facebook.com) 
+  - **Root Cause**: Tests were patching `@patch('app.Agent')` but Agent is created inside `Harvester.__init__()`
+  - **Solution**: Fixed mocking to `@patch('harvester.Agent')` to patch where Agent is actually instantiated
+  - **Impact**: All 9 Flask app tests now pass without unwanted browser launches, TDD workflow can continue safely
 
 ### Added
 - **Architectural Transition Plan**: Comprehensive 4-phase plan in `TASKS.md`
