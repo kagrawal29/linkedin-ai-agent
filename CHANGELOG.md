@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased] - 2025-06-10
 
 ### Added
-- **Prompt Interpreter**: Implemented the `PromptInterpreter` class, which uses the OpenAI GPT-4 API to parse natural language prompts into structured `Command` objects. The implementation follows a strict TDD cycle and includes robust error handling and secure API key management via a `.env` file.
+- Enhanced `PromptInterpreter` to recognize and parse "fetch_posts" commands, including default post limits (Sub-Task 6.B.2.1).
 - Initial project structure with all modules (`agent.py`, `interpreter.py`, etc.) and configuration files.
 - `README.md` with project vision, objectives, and structure.
 - `SYSTEM_DESIGN.md` outlining the agent's high-level architecture.

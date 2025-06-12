@@ -3,19 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinkedIn Agent - Prompt Interpreter</title>
+    <title>LinkedIn AI Agent</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Prompt Interpreter</h1>
-        <p>Enter a natural language prompt to see the structured command output.</p>
+        <h1>LinkedIn AI Agent</h1>
+        <p>Enter a natural language prompt for the LinkedIn AI Agent.</p>
         <form id="prompt-form">
             <textarea id="prompt-input" placeholder="e.g., Like 10 posts about machine learning"></textarea>
-            <button type="submit">Parse Prompt</button>
+            <button type="submit">Process Prompt</button>
         </form>
         <h2>Output</h2>
         <pre id="output-display"><code>{}</code></pre>
+        <h2>Messages</h2>
+        <div id="messages-output" class="output-messages"></div>
+
+        <h2>Fetched Posts</h2>
+        <div id="posts-output"></div>
     </div>
     <script src="/static/js/main.js"></script>
 </body>

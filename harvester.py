@@ -46,9 +46,10 @@ class Harvester:
         print(f"Executing Harvester task: {task}")
 
         agent = Agent(
-            llm=self.llm, # task removed from constructor
+            llm=self.llm,
+            task=task # Pass task to Agent constructor
         )
-        agent_output = await agent.run(task=task) # task passed to run method
+        agent_output = await agent.run() # task is now set in __init__
 
         if engagement == "fetch_posts":
             if isinstance(agent_output, list):

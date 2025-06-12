@@ -1,120 +1,327 @@
 # Task Manager
 
-This document tracks the project's tasks based on the 1-week sprint plan.
+This document tracks the project's tasks for transitioning from a constrained interpreter to a general-purpose AI agent architecture.
 
-## 1-Week Sprint Plan
+## **ARCHITECTURAL TRANSITION SPRINT PLAN**
 
-| Day     | Deliverable                                         | Status      |
-| :------ | :-------------------------------------------------- | :---------- |
-| **Day 1** | Repo scaffold, env setup, Prompt Interpreter done.  | ✅ Done |
-| **Day 2** | Feed Harvester + basic extraction.                  | ⏳ In Progress |
-| **Day 3** | Filtering engine, logging stub.                     | 📋 To Do     |
-| **Day 4** | Research & Comment draft; CLI preview.              | 📋 To Do     |
-| **Day 5** | Engagement Executor (like, comment) + supervised UI.| 📋 To Do     |
-| **Day 6** | Autonomous flow, full logging, unit tests.          | 📋 To Do     |
-| **Day 7** | Hardening, risk mitigations, README with usage steps.| 📋 To Do     |
+**Vision:** Transform from engagement-type-limited system to flexible, natural language AI agent leveraging browser-use's full capabilities.
 
-### Task Breakdown (TDD Workflow)
+**Methodology:** Strict TDD (RED-GREEN-REFACTOR) with continuous functionality validation.
 
-#### Day 1: Scaffolding & Prompt Interpreter
-- [x] Create project directory and file structure.
-- [x] Initialize Git and push to a new GitHub repository.
-- [x] Set up a Python virtual environment and install dependencies.
-- [x] Create `SYSTEM_DESIGN.md`, `TASKS.md`, and `WINDSURF_RULES.md`.
-- [x] Architect the System: Populate all Python modules with high-level, plain English comments.
-- [x] Setup `tests/` directory for Test-Driven Development.
+| Phase | Deliverable | Duration | Status |
+|:------|:-----------|:---------|:-------|
+| **Phase 1** | Architecture Transition (PromptTransformer) | Days 1-2 | 📋 Planned |
+| **Phase 2** | Enhanced Capabilities & Safety | Days 3-4 | 📋 Planned |
+| **Phase 3** | Testing & Optimization | Days 5-6 | 📋 Planned |
+| **Phase 4** | Documentation & Deployment | Day 7 | 📋 Planned |
 
-- [x] **Implement `interpreter.py`**
-    - [x] **1. RED**: Write a failing test for `parse_prompt` in `tests/test_interpreter.py` for a simple, clear prompt.
-    - [x] **2. GREEN**: Write the simplest code in `interpreter.py` to make the test pass.
-    - [x] **3. REFACTOR**: Improve the `parse_prompt` function.
-    - [x] **4. RED**: Write a failing test for handling ambiguous prompts.
-    - [x] **5. GREEN**: Add logic to `parse_prompt` to handle ambiguity.
-    - [x] **6. REFACTOR**: Improve the ambiguity-handling code.
+---
 
-#### Bonus Task: Interpreter UI
-- [x] **Implement Basic UI**: Create a simple web interface using Flask to allow users to input a prompt and see the structured output from the `PromptInterpreter`.
+## **COMPLETED WORK (Previous Architecture)**
 
-#### Day 2: Feed Harvester (with browser-use)
+### ✅ Day 1-2: Foundation & Constrained Interpreter
+- [x] **Project Setup**
+  - [x] Repository scaffolding, environment setup
+  - [x] Git initialization and GitHub repository
+  - [x] Python virtual environment and dependencies
+  - [x] Documentation structure (`SYSTEM_DESIGN.md`, `CHANGELOG.md`, `.windsurfrules`)
 
-- [x] **1. Integrate `browser-use` Dependency**
-  - [x] Add `browser-use` and `langchain-openai` to `requirements.txt`.
-  - [x] Install the new dependencies into the virtual environment.
+- [x] **Constrained Interpreter Implementation (TDD)**
+  - [x] **RED**: Failing tests for structured command parsing
+  - [x] **GREEN**: `PromptInterpreter` class with OpenAI structured parsing
+  - [x] **REFACTOR**: System prompt for engagement type validation
+  - [x] **Command** model with engagement type constraints (`like`, `comment`, `share`, `fetch_posts`)
 
-- [x] **Phase 1: Core Harvester Implementation (TDD)**
-  - [x] **Task 1: RED** - Write a failing test in `tests/test_harvester.py` that mocks the `browser-use` `Agent` and asserts it's called with a correctly formatted task string.
-  - [x] **Task 2: GREEN** - Implement the minimal `Harvester` class and `harvest` method in `harvester.py` to make the test pass.
-  - [x] **Task 3: REFACTOR** - Clean up the initial implementation, add docstrings, and improve the task-generation logic.
+- [x] **Harvester Integration (TDD)**
+  - [x] **RED**: Failing tests for browser-use integration
+  - [x] **GREEN**: Command-to-task conversion logic
+  - [x] **REFACTOR**: FetchedPost model and parsing logic
 
-- [x] **Phase 2: Expanding Functionality (Harvester - TDD)**
-  - [x] **Task 4: TDD - Implement Core Post Fetching and Detailed Engagement Handling**
-    - [x] **Sub-Task 4.1: Define Post Data Structure** - Create a Pydantic model (`FetchedPost`) for structured post data (e.g., URL, author, content, engagement counts).
-    - [x] **Sub-Task 4.2: TDD - Implement Post Fetching Logic**
-        - [x] **RED**: Write a failing test (`test_harvester_fetches_posts`) ensuring `Harvester.harvest` returns a list of `FetchedPost` objects when given a command to fetch posts. Mock the browser agent to return simulated structured post data.
-        - [x] **GREEN**: Modify `Harvester.harvest` to generate a task string for the browser agent to find and extract post details. Parse the agent's (mocked) output into `List[FetchedPost]`.
-        - [x] **REFACTOR**: Clean up post fetching and parsing logic.
-    - [x] **Sub-Task 4.3: TDD - Refine Engagement Command Handling** (like, comment, connect)
-        - [x] Initial tests for `like`, `comment`, `connect` created (assuming agent handles full "find and engage" sequence).
-        - [ ] Review and adapt these tests/logic if Harvester's role shifts to primarily fetching, with a separate Executor handling engagements on fetched posts.
+- [x] **Flask UI Implementation**
+  - [x] Basic web interface with prompt input
+  - [x] Dual endpoints: `/api/parse` and `/api/process_prompt_and_fetch`
+  - [x] Post display functionality
 
-- [ ] **Phase 3: Integration and Finalization (Harvester)**
-  - [x] **Task 6.A: Basic Browser E2E Test** - Verified `browser-use` can access logged-in LinkedIn.
-  - [ ] **Task 6.B: UI E2E Test - Fetch and Display Posts**
-      - [ ] **Objective**: Test the flow: UI Prompt -> Interpreter -> Harvester (live post fetching) -> Display fetched posts on UI.
-      - [ ] **Steps**:
-          - [ ] Ensure Harvester's `harvest` method (from Task 4.2) can return `List[FetchedPost]` based on a live agent call.
-          - [ ] Modify the Flask app (`app.py`) to orchestrate this flow.
-          - [ ] Create/update an HTML template to render `List[FetchedPost]`.
-          - [ ] Manually test the full flow.
-  - [ ] **Task 7: Documentation** - Update `README.md` for Harvester.
-  - [ ] **Task 8: Merge** - Merge `feature/harvester` into `main`.
+- [x] **Testing Infrastructure**
+  - [x] Unit tests for interpreter (`tests/test_interpreter.py`)
+  - [x] Unit tests for harvester (`tests/test_harvester.py`)
+  - [x] End-to-end browser testing validation
 
-#### Day 3: Filtering Engine & Logging Stub
-- [ ] **Implement `filter_engine.py`**
-    - [ ] **1. RED**: Write a test in `tests/test_filter_engine.py` with mock posts and rules; test that it correctly filters by keyword.
-    - [ ] **2. GREEN**: Write simple code in `filter_engine.py` to filter by keyword.
-    - [ ] **3. REFACTOR**: Improve the keyword filtering logic.
-    - [ ] **4. RED**: Add tests for all other filter types (likes, comments, content type).
-    - [ ] **5. GREEN**: Implement the remaining filter logic.
-    - [ ] **6. REFACTOR**: Finalize the `apply_filters` function.
-- [ ] **Implement `logger.py` Stub**
-    - [ ] **1. RED**: Write a test in `tests/test_logger.py` to check if a log file is created and a message is written.
-    - [ ] **2. GREEN**: Write a simple `Logger` class that creates a file and writes a string to it.
-    - [ ] **3. REFACTOR**: Improve the basic logging mechanism.
+### ✅ **Key Learnings from Previous Implementation**
+- **Rate Limiting Issues**: OpenAI calls in interpreter + browser-use = frequent rate limits
+- **Over-Engineering**: Structured parsing duplicates browser-use's natural language capabilities
+- **Limited Flexibility**: Engagement type constraints prevent complex multi-step tasks
+- **Architecture Insight**: browser-use is designed for direct natural language input
 
-#### Day 4: Research & Comment Draft
-- [ ] **Implement `researcher.py`**
-    - [ ] **1. RED**: Write a test in `tests/test_researcher.py` to check if the `enrich_post` function returns a summary (mocking the LLM call).
-    - [ ] **2. GREEN**: Implement the basic `enrich_post` function structure.
-    - [ ] **3. REFACTOR**: Improve the summarization logic.
-- [ ] **Implement `commenter.py`**
-    - [ ] **1. RED**: Write a test in `tests/test_commenter.py` to check if `draft_comment` returns a string (mocking the LLM call).
-    - [ ] **2. GREEN**: Implement the `draft_comment` function to call the mocked LLM and return its text.
-    - [ ] **3. REFACTOR**: Improve the comment drafting logic, ensuring it uses the persona.
+---
 
-#### Day 5: Engagement Executor & Supervised UI
-- [ ] **Implement `executor.py`**
-    - [ ] **1. RED**: Write tests in `tests/test_executor.py` for `like` and `comment` methods, checking if they would interact with a mock browser object.
-    - [ ] **2. GREEN**: Implement the `like` and `comment` methods to call the mock browser's methods.
-    - [ ] **3. REFACTOR**: Clean up the executor code.
-- [ ] **Implement Supervised UI in `agent.py`**
-    - [ ] **1. RED**: Write a test to check if the agent presents a drafted comment and correctly interprets user input (e.g., 'P' for post).
-    - [ ] **2. GREEN**: Add the `input()` prompt and conditional logic to `agent.py`.
-    - [ ] **3. REFACTOR**: Improve the supervised mode user interface.
+## **PHASE 1: ARCHITECTURE TRANSITION (TDD)**
 
-#### Day 6: Autonomous Flow & Full Logging
-- [ ] **Integrate Autonomous Flow in `agent.py`**
-    - [ ] **1. RED**: Write an end-to-end integration test that runs the full agent pipeline (with all external calls mocked) and checks if the executor's methods are called in autonomous mode.
-    - [ ] **2. GREEN**: Connect all the modules in `agent.py` to create the full pipeline.
-    - [ ] **3. REFACTOR**: Clean up the main agent orchestration logic.
-- [ ] **Expand `logger.py`**
-    - [ ] **1. RED**: Write a test to ensure logs are written in a structured JSONL format.
-    - [ ] **2. GREEN**: Update the `Logger` to write in the JSONL format.
-    - [ ] **3. REFACTOR**: Improve the logging output and structure.
+**Objective:** Replace constrained interpreter with flexible prompt transformer while maintaining functionality.
 
-#### Day 7: Hardening & Documentation
-- [ ] **Error Handling**: Go through each module and add `try...except` blocks for anticipated issues (e.g., network errors, parsing failures).
-- [ ] **Unit Test Coverage**: Review test coverage and add more unit tests for edge cases.
-- [ ] **Update `README.md`**: Add final usage instructions, a guide on how to run the agent, and a description of the configuration files.
+### **1.1: PromptTransformer Implementation (TDD)**
 
-- [ ] **Final Code Review**: Read through the entire codebase to ensure it meets the standards defined in `WINDSURF_RULES.md`.
+- [ ] **Task 1.1.1: RED - Basic PromptTransformer Tests**
+  - [ ] Create `tests/test_prompt_transformer.py`
+  - [ ] Write failing test: `test_enhance_basic_prompt()`
+    ```python
+    def test_enhance_basic_prompt():
+        transformer = PromptTransformer()
+        user_prompt = "Like posts about AI"
+        enhanced = transformer.enhance_prompt(user_prompt)
+        assert "linkedin.com" in enhanced.lower()
+        assert "ai" in enhanced.lower()
+    ```
+  - [ ] Write failing test: `test_validate_empty_prompt()`
+  - [ ] Write failing test: `test_validate_malicious_prompt()`
+  - [ ] **Verify**: All tests fail (RED confirmed)
+
+- [ ] **Task 1.1.2: GREEN - Minimal PromptTransformer Implementation**
+  - [ ] Create `prompt_transformer.py`
+  - [ ] Implement minimal `PromptTransformer` class
+    ```python
+    class PromptTransformer:
+        def enhance_prompt(self, user_prompt: str) -> str:
+            # Minimal implementation to pass tests
+    ```
+  - [ ] Basic validation methods
+  - [ ] **Verify**: All tests pass (GREEN confirmed)
+
+- [ ] **Task 1.1.3: REFACTOR - Improve PromptTransformer**
+  - [ ] Add LinkedIn context enhancement
+  - [ ] Improve prompt optimization
+  - [ ] Add safety validation
+  - [ ] **Verify**: All tests still pass, code is cleaner
+
+### **1.2: Harvester Simplification (TDD)**
+
+- [ ] **Task 1.2.1: RED - String-Based Harvester Tests**
+  - [ ] Update `tests/test_harvester.py`
+  - [ ] Write failing test: `test_harvest_with_string_prompt()`
+    ```python
+    @patch('harvester.Agent')
+    def test_harvest_with_string_prompt(self, mock_agent_class):
+        harvester = Harvester()
+        prompt = "Find 3 posts about renewable energy on LinkedIn"
+        result = asyncio.run(harvester.harvest(prompt))
+        # Assert Agent called with enhanced prompt
+    ```
+  - [ ] Remove all Command object tests
+  - [ ] **Verify**: Tests fail due to signature mismatch (RED confirmed)
+
+- [ ] **Task 1.2.2: GREEN - Update Harvester Signature**
+  - [ ] Change `harvest(self, command: Command)` → `harvest(self, enhanced_prompt: str)`
+  - [ ] Remove Command import and logic
+  - [ ] Simplify task generation - direct prompt passing
+  - [ ] **Verify**: Tests pass (GREEN confirmed)
+
+- [ ] **Task 1.2.3: REFACTOR - Clean Up Harvester**
+  - [ ] Remove engagement type branching
+  - [ ] Improve error handling
+  - [ ] Add prompt logging
+  - [ ] **Verify**: Tests still pass, code is simpler
+
+### **1.3: Flask App Migration (TDD)**
+
+- [ ] **Task 1.3.1: RED - New Endpoint Tests**
+  - [ ] Create `tests/test_app_integration.py`
+  - [ ] Write failing test for simplified `/api/process` endpoint
+  - [ ] Test PromptTransformer integration
+  - [ ] **Verify**: Tests fail (RED confirmed)
+
+- [ ] **Task 1.3.2: GREEN - Update Flask App**
+  - [ ] Remove `from interpreter import PromptInterpreter, Command`
+  - [ ] Add `from prompt_transformer import PromptTransformer`
+  - [ ] Replace `/api/parse` and `/api/process_prompt_and_fetch` with single `/api/process`
+  - [ ] Update flow: `prompt → transformer → harvester → response`
+  - [ ] **Verify**: Tests pass, app runs (GREEN confirmed)
+
+- [ ] **Task 1.3.3: REFACTOR - Simplify App Logic**
+  - [ ] Clean up error handling
+  - [ ] Improve response structure
+  - [ ] Add request logging
+  - [ ] **Verify**: Tests still pass, cleaner code
+
+### **1.4: End-to-End Validation (TDD)**
+
+- [ ] **Task 1.4.1: Manual E2E Testing**
+  - [ ] Start Flask app: `venv/bin/python3 app.py`
+  - [ ] Test simple prompt: "Show me posts about machine learning"
+  - [ ] Test complex prompt: "Find AI researchers who graduated from Stanford and engage with their recent posts"
+  - [ ] **Verify**: Both work without engagement type errors
+
+- [ ] **Task 1.4.2: Automated E2E Tests**
+  - [ ] Create `tests/test_e2e_transition.py`
+  - [ ] Test full pipeline with mock browser-use
+  - [ ] Compare functionality vs previous version
+  - [ ] **Verify**: No regression in basic functionality
+
+---
+
+## **PHASE 2: ENHANCED CAPABILITIES & SAFETY (TDD)**
+
+**Objective:** Add advanced prompt enhancement and safety features.
+
+### **2.1: Advanced Prompt Enhancement (TDD)**
+
+- [ ] **Task 2.1.1: RED - Complex Prompt Tests**
+  - [ ] Test multi-step prompts: "Find CTOs at YC companies, check their recent posts about hiring, and comment thoughtfully"
+  - [ ] Test profile management: "Update my headline to mention my new certification"
+  - [ ] Test contextual understanding: "Look for people discussing the latest AI paper and engage"
+  - [ ] **Verify**: Current implementation fails (RED confirmed)
+
+- [ ] **Task 2.1.2: GREEN - Context-Aware Enhancement**
+  - [ ] Add multi-step task breakdown in PromptTransformer
+  - [ ] Add LinkedIn-specific context injection
+  - [ ] Add persona integration for personalized responses
+  - [ ] **Verify**: Complex prompts work (GREEN confirmed)
+
+- [ ] **Task 2.1.3: REFACTOR - Optimize Enhancement Logic**
+  - [ ] Improve prompt clarity for browser-use
+  - [ ] Add task prioritization
+  - [ ] Optimize for token efficiency
+  - [ ] **Verify**: Same functionality, better performance
+
+### **2.2: Safety & Validation (TDD)**
+
+- [ ] **Task 2.2.1: RED - Safety Tests**
+  - [ ] Test malicious prompt detection
+  - [ ] Test spam prevention
+  - [ ] Test professional boundary enforcement
+  - [ ] **Verify**: Unsafe prompts currently pass through (RED confirmed)
+
+- [ ] **Task 2.2.2: GREEN - Safety Implementation**
+  - [ ] Add malicious intent detection
+  - [ ] Add rate limiting guidance
+  - [ ] Add professional conduct warnings
+  - [ ] **Verify**: Safety tests pass (GREEN confirmed)
+
+- [ ] **Task 2.2.3: REFACTOR - Improve Safety UX**
+  - [ ] Add user education on safe prompts
+  - [ ] Improve error messages
+  - [ ] Add suggestion system for rejected prompts
+  - [ ] **Verify**: Better user experience, same security
+
+---
+
+## **PHASE 3: TESTING & OPTIMIZATION (TDD)**
+
+**Objective:** Comprehensive testing and performance optimization.
+
+### **3.1: Performance Testing**
+
+- [ ] **Task 3.1.1: Rate Limiting Mitigation**
+  - [ ] Test token usage: new vs old system
+  - [ ] Implement retry logic with exponential backoff
+  - [ ] Add request queuing for high-volume usage
+  - [ ] **Verify**: Reduced rate limiting incidents
+
+- [ ] **Task 3.1.2: Response Time Optimization**
+  - [ ] Profile prompt processing time
+  - [ ] Optimize PromptTransformer logic
+  - [ ] Add caching for common enhancements
+  - [ ] **Verify**: Faster response times
+
+### **3.2: Comprehensive Testing**
+
+- [ ] **Task 3.2.1: Edge Case Coverage**
+  - [ ] Test prompts in different languages
+  - [ ] Test very long prompts
+  - [ ] Test ambiguous prompts
+  - [ ] Test error recovery scenarios
+  - [ ] **Verify**: Robust handling of edge cases
+
+- [ ] **Task 3.2.2: Integration Testing**
+  - [ ] Test with actual LinkedIn (browser-use)
+  - [ ] Test various browser states
+  - [ ] Test network failure scenarios
+  - [ ] **Verify**: Reliable real-world performance
+
+---
+
+## **PHASE 4: DOCUMENTATION & DEPLOYMENT (TDD)**
+
+**Objective:** Document new capabilities and prepare for production.
+
+### **4.1: Documentation Updates**
+
+- [ ] **Task 4.1.1: Update README.md**
+  - [ ] Document new natural language capabilities
+  - [ ] Add example prompts (simple to complex)
+  - [ ] Update setup instructions
+  - [ ] Add troubleshooting guide
+
+- [ ] **Task 4.1.2: Update Technical Documentation**
+  - [ ] Update `SYSTEM_DESIGN.md` with new architecture
+  - [ ] Document removed constraints
+  - [ ] Add performance benchmarks
+  - [ ] Update API documentation
+
+### **4.2: User Guide & Examples**
+
+- [ ] **Task 4.2.1: Create Prompt Examples Library**
+  - [ ] Basic actions: "Like posts about X"
+  - [ ] Advanced actions: "Find and engage with Y professionals"
+  - [ ] Multi-step workflows: "Research topic X, then do Y"
+  - [ ] Profile management: "Update my Z section"
+
+- [ ] **Task 4.2.2: Best Practices Guide**
+  - [ ] Effective prompt writing
+  - [ ] Professional conduct guidelines
+  - [ ] Rate limiting awareness
+  - [ ] Safety considerations
+
+### **4.3: Final Validation**
+
+- [ ] **Task 4.3.1: Full System Test**
+  - [ ] Test all documented examples
+  - [ ] Validate performance improvements
+  - [ ] Confirm no regressions
+  - [ ] **Success Criteria**: All examples work, system is more capable than before
+
+- [ ] **Task 4.3.2: Code Review & Cleanup**
+  - [ ] Remove unused files/code
+  - [ ] Update dependency list
+  - [ ] Final lint and formatting
+  - [ ] Update `CHANGELOG.md`
+
+---
+
+## **SUCCESS METRICS**
+
+**Quantitative:**
+- [ ] Lines of code reduced by >50%
+- [ ] API calls reduced by >40%
+- [ ] Rate limiting incidents reduced by >70%
+- [ ] Response time improved by >30%
+
+**Qualitative:**
+- [ ] Support for complex multi-step tasks
+- [ ] Natural language interface (no syntax learning)
+- [ ] Enhanced LinkedIn capabilities
+- [ ] Maintained safety and reliability
+
+**Test Coverage:**
+- [ ] >90% test coverage maintained
+- [ ] All TDD cycles completed (RED-GREEN-REFACTOR)
+- [ ] Zero regressions in core functionality
+- [ ] Comprehensive edge case handling
+
+---
+
+## **ROLLBACK PLAN**
+
+If critical issues arise during transition:
+- [ ] **Phase 1 Rollback**: Revert to `interpreter.py` + `Command` objects
+- [ ] **Phase 2 Rollback**: Disable advanced features, keep basic transformer
+- [ ] **Full Rollback**: Git revert to pre-transition commit
+
+**Rollback Triggers:**
+- [ ] >50% increase in error rate
+- [ ] Critical functionality completely broken
+- [ ] Unresolvable security vulnerabilities
+- [ ] Performance degradation >2x
+
+---
+
+This plan maintains our TDD discipline while transitioning to a more powerful, flexible architecture. Each phase builds incrementally with continuous validation of functionality.

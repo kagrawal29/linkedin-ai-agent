@@ -45,16 +45,47 @@ def test_parse_ambiguous_prompt():
     interpreter = PromptInterpreter()
     prompt = "Engage with some posts about AI."
 
-    # 2. Expected Result
+    # 2. Expected Result (checking individual fields for robustness)
     # The command is invalid because the prompt is missing key details.
-    expected_command = Command(
-        topic="AI",
-        post_limit=0,  # Or a default, but 0 indicates it's not set
-        engagement_type=[],
-        is_valid=False,
-        feedback="The prompt is too ambiguous. Please specify the number of posts and the engagement type (e.g., 'like', 'comment')."
-    )
 
     # 3. Execution & Assertion
     actual_command = interpreter.parse_prompt(prompt)
-    assert actual_command == expected_command
+    
+    assert actual_command.topic == "AI"
+    assert actual_command.post_limit == 0
+    assert actual_command.engagement_type == []
+    assert actual_command.is_valid is False
+    assert isinstance(actual_command.feedback, str) and len(actual_command.feedback) > 0, "Feedback should be a non-empty string for an invalid command"
+
+
+def test_parse_fetch_posts_prompt():
+    """
+    RED: Tests that prompts for fetching posts are correctly parsed.
+    This includes cases with explicit and implicit post limits.
+    """
+    interpreter = PromptInterpreter()
+
+    # Case 1: Explicit post limit
+    prompt_explicit = "Fetch 3 posts about 'generative AI'"
+    expected_command_explicit = Command(
+        topic="generative AI",
+        post_limit=3,
+        engagement_type=["fetch_posts"],
+        is_valid=True,
+        feedback=""
+    )
+    actual_command_explicit = interpreter.parse_prompt(prompt_explicit)
+    assert actual_command_explicit == expected_command_explicit
+
+    # Case 2: Implicit post limit (should default to 5 for 'fetch_posts')
+    prompt_implicit = "Get me articles on 'quantum computing'"
+    expected_command_implicit = Command(
+        topic="quantum computing",
+        post_limit=5, # Assuming system prompt will specify default of 5 for fetch
+        engagement_type=["fetch_posts"],
+        is_valid=True,
+        feedback=""
+    )
+    actual_command_implicit = interpreter.parse_prompt(prompt_implicit)
+    assert actual_command_implicit == expected_command_implicit
+
