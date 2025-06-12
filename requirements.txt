@@ -9,5 +9,7 @@ pytest-dotenv
 Flask
 browser-use
 langchain-openai
+apscheduler>=3.9.0
+psutil>=5.9.0
 # For Phase-2 Streamlit dashboard (optional)
 # streamlit
