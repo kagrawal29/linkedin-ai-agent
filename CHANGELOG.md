@@ -1,5 +1,45 @@
 # Changelog
 
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased] - 2025-06-12
+
+### 🚀 MAJOR ARCHITECTURAL TRANSITION - In Progress
+**Vision**: Transitioning from constrained interpreter to flexible, natural language AI agent leveraging browser-use's full capabilities.
+
+#### ✅ Phase 0: Constrained Interpreter (COMPLETED)
+- **Prompt Interpreter**: Full implementation with OpenAI structured parsing
+- **Harvester Integration**: Working browser-use Agent integration with task conversion
+- **Flask UI**: Dual endpoints (`/api/parse`, `/api/process_prompt_and_fetch`) with post display
+- **Test Coverage**: Comprehensive TDD coverage for interpreter and harvester modules
+- **FetchedPost Model**: Structured post data parsing with Pydantic validation
+- **Environment Fixes**: Resolved API key loading and environment variable issues
+
+#### 📋 Phase 1: Architecture Transition (PLANNED)
+- **PromptTransformer**: Replace constrained interpreter with flexible prompt enhancement
+- **Harvester Simplification**: Direct natural language prompt handling (remove Command objects)
+- **Flask App Migration**: Single `/api/process` endpoint with streamlined flow
+- **Test Migration**: Rewrite tests for string-based prompts vs structured commands
+
+### Added
+- **Architectural Transition Plan**: Comprehensive 4-phase plan in `TASKS.md`
+  - Phase 1: Architecture Transition (PromptTransformer)
+  - Phase 2: Enhanced Capabilities & Safety
+  - Phase 3: Testing & Optimization  
+  - Phase 4: Documentation & Deployment
+- **Success Metrics**: Quantifiable goals (50% code reduction, 40% fewer API calls, 70% fewer rate limits)
+- **Rollback Plan**: Safety mechanisms for reverting changes if issues arise
+- **Git Workflow**: Feature branch `feature/prompt-transformer-transition` for transition work
+
+### Changed
+- **Development Methodology**: Strict TDD (RED-GREEN-REFACTOR) maintained throughout transition
+- **Architecture Vision**: From engagement-type-limited system to general-purpose AI agent
+
+---
+
 ## [0.1.0] - YYYY-MM-DD
 
 ### Added
@@ -14,11 +54,6 @@
 
 ### Fixed
 - Resolved multiple test failures by refining the system prompt and switching to Pydantic-based response parsing.
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased] - 2025-06-10
 

@@ -1,76 +1,58 @@
 # harvester.py
 
 import asyncio
-from langchain_openai import ChatOpenAI
 from browser_use import Agent
 from dotenv import load_dotenv
-
-from interpreter import Command
-from models import FetchedPost # Added
-from typing import List, Union # Added
+from langchain_openai import ChatOpenAI
+from models import FetchedPost
+from typing import Union, List, Optional, Any
 
 load_dotenv()
 
+"""
+Harvester module for executing LinkedIn tasks via browser automation.
+
+This module has been simplified to accept natural language prompts directly
+and pass them to browser-use Agent, eliminating the need for command parsing.
+"""
+
 class Harvester:
     """
-    Uses the browser-use agent to perform actions on LinkedIn based on a command.
+    Simplified harvester that executes natural language prompts on LinkedIn.
+    
+    Replaces the complex command-based approach with direct prompt passing
+    to browser-use Agent for maximum flexibility.
     """
-
+    
     def __init__(self):
-        """Initializes the Harvester with an LLM."""
+        """Initialize the Harvester with an LLM for the browser-use Agent."""
         self.llm = ChatOpenAI(model="gpt-4o", temperature=0)
-
-    async def harvest(self, command: Command) -> Union[List[FetchedPost], str]: # Return type changed
+    
+    async def harvest(self, prompt: Optional[str]) -> Union[List[FetchedPost], str, List[Any]]:
         """
-        Translates a Command object into a natural language task and executes it.
+        Execute a natural language prompt on LinkedIn via browser-use Agent.
+        
+        Args:
+            prompt: Natural language instruction for LinkedIn automation
+            
+        Returns:
+            Agent execution results - can be string confirmation, 
+            list of structured data, or parsed FetchedPost objects
+            
+        Raises:
+            ValueError: If prompt is empty or None
         """
-        engagement = command.engagement_type[0]
-        if engagement == "like":
-            task = f"Go to linkedin.com, log in if needed, and then like {command.post_limit} posts about '{command.topic}'."
-        elif engagement == "comment":
-            task = f"Go to linkedin.com, log in if needed, find {command.post_limit} posts about '{command.topic}', and then draft a relevant comment for each."
-        elif engagement == "connect":
-            # For 'connect', topic describes the person, post_limit is number of connections
-            task = f"Go to linkedin.com, log in if needed, find {command.post_limit} people who are '{command.topic}', and then send connection requests."
-        elif engagement == "fetch_posts":
-            task = (
-                f"Go to linkedin.com, log in if needed. Search for posts about '{command.topic}'. "
-                f"Extract details (post_id, post_url, author_name, author_url, author_headline, content_text, "
-                f"posted_timestamp_str, likes_count, comments_count, reposts_count, views_count) "
-                f"for the first {command.post_limit} relevant posts. Return this information as a list of structured objects."
-            )
-        else:
-            # Fallback for any other unimplemented engagement types
-            task = f"Go to linkedin.com, log in if needed, and then {engagement} {command.post_limit} posts about '{command.topic}'."
-
-        print(f"Executing Harvester task: {task}")
-
-        agent = Agent(
-            llm=self.llm,
-            task=task # Pass task to Agent constructor
-        )
-        agent_output = await agent.run() # task is now set in __init__
-
-        if engagement == "fetch_posts":
-            if isinstance(agent_output, list):
-                fetched_posts = []
-                for item_data in agent_output:
-                    if isinstance(item_data, dict):
-                        try:
-                            fetched_posts.append(FetchedPost(**item_data))
-                        except Exception as e: # Catch Pydantic validation errors or other issues
-                            print(f"Error parsing item into FetchedPost: {item_data}, Error: {e}")
-                            # Decide if we want to skip this item or handle error differently
-                    else:
-                        print(f"Warning: Expected a dict from agent output for post item, got {type(item_data)}")
-                return fetched_posts
-            else:
-                print(f"Warning: Expected a list from agent for 'fetch_posts', got {type(agent_output)}")
-                return [] # Return empty list if agent output is not a list
-        else:
-            # For other engagement types, they currently expect a string result.
-            # For type consistency with List[FetchedPost], we return an empty list for now.
-            # This will need to be refactored if these engagements should also return posts
-            # or if the harvest method should have a more generic return type (e.g., Union[str, List[FetchedPost]]).
-            print(f"Agent output for '{engagement}': {agent_output}") # Keep this to see what agent returns
-            return str(agent_output) # Return the agent's output as a string
+        # Validate input
+        if not prompt or not prompt.strip():
+            raise ValueError("Empty prompt not allowed")
+        
+        # Clean the prompt
+        clean_prompt = prompt.strip()
+        
+        # Create and execute browser-use Agent with the prompt
+        agent = Agent(llm=self.llm, task=clean_prompt)
+        result = await agent.run()
+        
+        # Return the agent's result directly
+        # The agent can return various types (string, list, etc.)
+        return result
