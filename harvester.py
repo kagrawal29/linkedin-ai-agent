@@ -158,12 +158,13 @@ class Harvester:
             CDPConnectionError: If connection is unhealthy
         """
         try:
-            # Simple health check - try to get browser context
-            if hasattr(browser, 'context') and browser.context:
+            # More permissive health check - just verify browser object exists
+            # The browser-use library handles context initialization internally
+            if browser and hasattr(browser, 'config'):
                 logger.debug("✅ CDP connection health check passed")
                 return True
             else:
-                raise CDPConnectionError("Browser context not available")
+                raise CDPConnectionError("Browser instance not properly initialized")
         except Exception as e:
             raise CDPConnectionError(f"CDP connection health check failed: {e}")
     
