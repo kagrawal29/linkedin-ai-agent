@@ -27,22 +27,12 @@ class Harvester:
     """
     
     def __init__(self):
-        """Initialize the Harvester with an LLM and persistent browser config."""
+        """Initialize the Harvester with an LLM."""
         self.llm = ChatOpenAI(model="gpt-4o", temperature=0)
         
-        # Set up persistent browser session directory
+        # Set up browser data directory for future persistence
         self.browser_data_dir = Path.home() / ".linkedin_ai_agent" / "browser_data"
         self.browser_data_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Browser configuration for persistent sessions
-        self.browser_config = {
-            "headless": False,  # Keep visible for debugging and manual login
-            "user_data_dir": str(self.browser_data_dir),
-            "disable_dev_shm_usage": True,
-            "no_sandbox": True,
-            "disable_web_security": True,
-            "disable_features": "VizDisplayCompositor"
-        }
     
     async def harvest(self, prompt: Optional[str]) -> Union[List[FetchedPost], str, List[Any]]:
         """
@@ -77,11 +67,10 @@ class Harvester:
         5. Return structured data when possible
         """
         
-        # Create browser-use Agent with persistent session
+        # Create browser-use Agent with basic configuration
         agent = Agent(
-            llm=self.llm, 
             task=enhanced_prompt,
-            browser_config=self.browser_config
+            llm=self.llm
         )
         
         result = await agent.run()
@@ -89,7 +78,7 @@ class Harvester:
         return result
     
     def get_browser_data_path(self) -> str:
-        """Get the path to the persistent browser data directory."""
+        """Get the path to the browser data directory."""
         return str(self.browser_data_dir)
     
     def clear_browser_data(self) -> None:
@@ -101,5 +90,9 @@ class Harvester:
             print("✅ Browser data cleared. You'll need to log in again.")
     
     def is_browser_data_present(self) -> bool:
-        """Check if browser data (likely including login state) exists."""
+        """Check if browser data exists."""
         return self.browser_data_dir.exists() and any(self.browser_data_dir.iterdir())
+    
+    async def close(self):
+        """Close method for compatibility."""
+        pass  # Agent handles its own cleanup

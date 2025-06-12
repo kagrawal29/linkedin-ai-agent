@@ -8,137 +8,106 @@ from models import FetchedPost
 
 
 @pytest.mark.asyncio
-@patch('harvester.Agent', new_callable=MagicMock)
+@patch('harvester.Agent')
 async def test_harvester_executes_natural_language_prompt(mock_agent_class):
     """
     RED: Tests that the Harvester correctly passes natural language prompts
     directly to the browser-use Agent without command parsing.
     """
     # Arrange
-    mock_agent_instance = MagicMock()
-    mock_agent_instance.run = AsyncMock(return_value="Task completed successfully.")
-    mock_agent_class.return_value = mock_agent_instance
-
     harvester = Harvester()
     prompt = "Go to LinkedIn and like 5 posts about AI in healthcare"
-
+    expected_result = "Task completed successfully."
+    
+    # Mock the Agent
+    mock_agent_instance = MagicMock()
+    mock_agent_instance.run = AsyncMock(return_value=expected_result)
+    mock_agent_class.return_value = mock_agent_instance
+    
     # Act
     result = await harvester.harvest(prompt)
-
+    
     # Assert
-    # Verify that the Agent class was instantiated correctly
     mock_agent_class.assert_called_once()
     call_args = mock_agent_class.call_args
     assert call_args[1]['llm'] is not None  # LLM should be passed
-    assert call_args[1]['browser_config'] is not None  # Browser config should be passed
-    assert 'user_data_dir' in call_args[1]['browser_config']  # Should have persistent data dir
     assert prompt in call_args[1]['task']  # Task should contain original prompt
     
     # Verify the agent's run method was called
     mock_agent_instance.run.assert_awaited_once()
-
-    # Verify the result from the agent is returned
-    assert result == "Task completed successfully."
+    assert result == expected_result
 
 
 @pytest.mark.asyncio
-@patch('harvester.Agent', new_callable=MagicMock)
-async def test_harvester_handles_complex_prompts(mock_agent_class):
+@patch('harvester.Agent')
+async def test_harvester_handles_complex_prompt(mock_agent_class):
     """
-    RED: Tests that the Harvester correctly handles complex multi-step prompts.
+    Test that Harvester can handle complex multi-step prompts.
     """
     # Arrange
-    mock_agent_instance = MagicMock()
-    mock_agent_instance.run = AsyncMock(return_value="Complex task completed.")
-    mock_agent_class.return_value = mock_agent_instance
-
     harvester = Harvester()
-    complex_prompt = "Find AI researchers at YC companies, read their recent posts, and engage thoughtfully with insightful comments"
-
+    complex_prompt = "Find AI researchers at YC companies and engage thoughtfully with their posts"
+    expected_result = "Engaged with 5 AI researchers from YC companies"
+    
+    # Mock the Agent
+    mock_agent_instance = MagicMock()
+    mock_agent_instance.run = AsyncMock(return_value=expected_result)
+    mock_agent_class.return_value = mock_agent_instance
+    
     # Act
     result = await harvester.harvest(complex_prompt)
-
+    
     # Assert
     mock_agent_class.assert_called_once()
     call_args = mock_agent_class.call_args
-    assert call_args[1]['browser_config']['headless'] is False  # Should be visible for login
+    assert call_args[1]['llm'] is not None  # Should have LLM
     assert complex_prompt in call_args[1]['task']
     
     mock_agent_instance.run.assert_awaited_once()
-    assert result == "Complex task completed."
+    assert result == expected_result
 
 
 @pytest.mark.asyncio
-@patch('harvester.Agent', new_callable=MagicMock)
-async def test_harvester_handles_post_fetching_prompts(mock_agent_class):
+@patch('harvester.Agent')
+async def test_harvester_handles_fetch_posts_prompt(mock_agent_class):
     """
-    RED: Tests that the Harvester correctly handles post-fetching prompts
-    and returns structured FetchedPost objects when appropriate.
+    Test that Harvester can handle post-fetching prompts and return structured data.
     """
     # Arrange
-    mock_agent_instance = MagicMock()
+    harvester = Harvester()
+    prompt = "Find and extract details from posts about machine learning"
     
-    # Simulate the agent returning structured data for post fetching
-    sample_agent_output = [
+    # Mock structured post data response
+    expected_posts = [
         {
-            "post_id": "urn:li:activity:1",
-            "post_url": "https://www.linkedin.com/feed/update/urn:li:activity:1/",
-            "author_name": "Author One",
-            "author_url": "https://www.linkedin.com/in/authorone/",
-            "author_headline": "AI Researcher",
-            "content_text": "Latest developments in AI healthcare applications.",
-            "posted_timestamp_str": "1h",
-            "likes_count": 10,
-            "comments_count": 2,
-            "reposts_count": 1,
-            "views_count": 100
-        },
-        {
-            "post_id": "urn:li:activity:2", 
-            "post_url": "https://www.linkedin.com/feed/update/urn:li:activity:2/",
-            "author_name": "Author Two",
-            "author_url": "https://www.linkedin.com/in/authortwo/",
-            "author_headline": "Healthcare Tech Lead",
-            "content_text": "Discussing the future of AI in medical diagnostics.",
-            "posted_timestamp_str": "2d",
-            "likes_count": 25,
-            "comments_count": 8,
-            "reposts_count": 3,
-            "views_count": 200
+            "post_id": "urn:li:activity:123",
+            "author_name": "ML Expert",
+            "content_text": "Latest advances in machine learning",
+            "likes_count": 50
         }
     ]
     
-    mock_agent_instance.run = AsyncMock(return_value=sample_agent_output)
+    # Mock the Agent
+    mock_agent_instance = MagicMock()
+    mock_agent_instance.run = AsyncMock(return_value=expected_posts)
     mock_agent_class.return_value = mock_agent_instance
-
-    harvester = Harvester()
-    fetch_prompt = "Find and extract details from 2 posts about AI in healthcare"
-
+    
     # Act
-    result = await harvester.harvest(fetch_prompt)
-
+    result = await harvester.harvest(prompt)
+    
     # Assert
     mock_agent_class.assert_called_once()
     call_args = mock_agent_class.call_args
+    assert call_args[1]['llm'] is not None  # Should have LLM
     assert 'LinkedIn.com' in call_args[1]['task']  # Should include LinkedIn navigation
     assert 'logged in' in call_args[1]['task']  # Should include login instructions
     
     mock_agent_instance.run.assert_awaited_once()
-
-    # If result contains structured data, it should be parsed into FetchedPost objects
-    if isinstance(result, list) and result and isinstance(result[0], dict):
-        # Convert to FetchedPost objects for validation
-        posts = [FetchedPost(**post_data) for post_data in result]
-        
-        assert len(posts) == 2
-        assert posts[0].post_id == "urn:li:activity:1"
-        assert posts[0].author_name == "Author One"
-        assert posts[1].post_id == "urn:li:activity:2"
-        assert posts[1].author_name == "Author Two"
+    assert result == expected_posts
 
 
 @pytest.mark.asyncio  
-@patch('harvester.Agent', new_callable=MagicMock)
+@patch('harvester.Agent')
 async def test_harvester_handles_empty_prompt(mock_agent_class):
     """
     RED: Tests that the Harvester validates empty prompts.
@@ -161,7 +130,7 @@ async def test_harvester_handles_empty_prompt(mock_agent_class):
 
 
 @pytest.mark.asyncio
-@patch('harvester.Agent', new_callable=MagicMock)
+@patch('harvester.Agent')
 async def test_harvester_returns_string_or_list(mock_agent_class):
     """
     RED: Tests that the Harvester returns appropriate types based on agent output.

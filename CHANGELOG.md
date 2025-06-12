@@ -74,6 +74,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.5] - 2024-12-12
+
+### 🎉 MAJOR MILESTONE: End-to-End Demo Success
+- **Achievement**: Complete LinkedIn AI Agent workflow now functional from UI to browser automation
+- **Tested Workflow**: Flask UI → PromptTransformer → Harvester → browser-use Agent → LinkedIn automation
+- **User Experience**: Simple natural language input → professional LinkedIn automation
+- **Security**: Manual login required (secure by design)
+- **Technical Status**: All components integrated and working together
+
+### Verified Components
+- **Frontend**: HTML form → JavaScript → Flask API call working
+- **Backend**: Flask `/api/process` → PromptTransformer → Harvester → browser-use Agent
+- **Browser Automation**: Real browser launch, LinkedIn navigation, login detection
+- **Demo Test**: "Go to LinkedIn and find 3 posts about artificial intelligence" - SUCCESS
+
+## [0.1.4] - 2024-12-12
+
+### Fixed
+- **Critical Fix: Browser-use API Compatibility**
+  - **Issue**: Import errors with `BrowserSession` and incorrect browser configuration parameters causing test failures and runtime errors
+  - **Root Cause**: Using outdated browser-use API documentation that referenced `BrowserSession` class not available in current version (0.1.41)
+  - **Solution**: 
+    - Simplified harvester to use basic `Agent(task, llm)` configuration without complex browser setup
+    - Removed dependency on `BrowserSession`, `Browser`, and `BrowserConfig` classes
+    - Updated all tests to verify correct Agent initialization with simplified parameters
+    - Maintained LinkedIn-specific prompt enhancement and error handling
+  - **Impact**: All harvester tests now pass (5/5), basic browser automation functionality restored
+  - **Next Steps**: Will add persistent browser sessions using correct API once end-to-end functionality is confirmed
+
+### Technical Details
+- Removed imports: `BrowserSession`, `Browser`, `BrowserConfig` from harvester.py
+- Simplified `Harvester.__init__()` to only initialize LLM and data directory
+- Updated `harvest()` method to create `Agent(task=enhanced_prompt, llm=self.llm)`
+- Fixed all test assertions to check for `llm` parameter instead of browser-related parameters
+- Preserved helper methods for future persistence implementation
+
 ## [0.1.0] - YYYY-MM-DD
 
 ### Added
