@@ -46,7 +46,7 @@ def process_prompt():
         
         # Transform the prompt
         transformer = PromptTransformer()
-        transformed_prompt = transformer.transform(original_prompt)
+        transformed_prompt = transformer.enhance_prompt(original_prompt)
         
         # Handle case where transformation returns None/empty
         if not transformed_prompt:
@@ -82,7 +82,7 @@ def process_prompt():
             'status': 'success',
             'original_prompt': original_prompt,
             'transformed_prompt': transformed_prompt,
-            'result': agent_result if not extracted_posts else f"Successfully processed {len(extracted_posts)} posts",
+            'result': str(agent_result) if agent_result else "No result returned",
             'extracted_posts': extracted_posts,
             'agent_logs': agent_logs,
             'message': '✅ Prompt processed successfully with enhanced LinkedIn guidelines'

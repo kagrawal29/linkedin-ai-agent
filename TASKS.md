@@ -328,7 +328,7 @@ This document tracks the project's tasks for transitioning from a constrained in
   - [x] Test network timeout scenarios
   - [x] Test LinkedIn access issues (rate limits, login failures)
   - [x] Test graceful degradation and user feedback
-  - [x] **Verify**: Current implementation doesn't handle errors gracefully (RED confirmed)
+  - [x] **Verify**: No error handling for agent failures (RED confirmed)
 
 - [x] **GREEN - Implement Comprehensive Error Handling**
   - [x] Catch and categorize different types of agent failures
@@ -371,367 +371,370 @@ This document tracks the project's tasks for transitioning from a constrained in
 
 ---
 
-## **PHASE 3: DEBUGGING & VISIBILITY ENHANCEMENTS (COMPLETED WITH VALIDATION)**
+## **PHASE 4: CHROME CDP PERSISTENT LOGIN (HIGH PRIORITY)**
 
-**Branch:** `feature/debugging-visibility-enhancements` 
-**Status:** All TDD cycles complete + End-to-end testing validated + Ready for production
+**Branch**: `feature/chrome-cdp-connection`
+**Objective**: Connect browser-use to user's existing Chrome instance for persistent LinkedIn login
+**Priority**: CRITICAL - Foundation for all other Phase 4 enhancements
 
-### **COMPLETED - TDD Cycle 1: Transformed Prompt Display**
-- [x] **RED**: Create failing tests for showing original vs transformed prompts in API and UI
-- [x] **GREEN**: Implement Flask API changes to return both `original_prompt` and `transformed_prompt`
-- [x] **GREEN**: Update HTML template with prompt comparison UI sections
-- [x] **GREEN**: Update JavaScript to display prompt comparison with visual enhancement indicators
-- [x] **REFACTOR**: Add CSS styling for prompt display sections with dark theme consistency
-- [x] **VALIDATION**: End-to-end tested with real prompt transformation working perfectly
+### **Chrome CDP Connection Implementation (TDD Cycle 0)**
 
-### **COMPLETED - TDD Cycle 2: Agent Action Logging Framework**
-- [x] **RED**: Create failing tests for agent logs capture and display in API and UI
-- [x] **GREEN**: Add `agent_logs` structure to Flask API response format
-- [x] **GREEN**: Implement HTML template for agent logs display section
-- [x] **GREEN**: Update JavaScript to render agent logs with structured formatting
-- [x] **REFACTOR**: Add comprehensive CSS styling for log entries with color-coded status indicators
-- [x] **VALIDATION**: End-to-end tested with full AgentHistoryList details captured and displayed
+#### **Task 4.0.1: Chrome CDP Connection (RED-GREEN-REFACTOR)**
 
-### **COMPLETED - TDD Cycle 3: Structured Post Data Extraction**
-- [x] **RED**: Create failing tests for extracting and displaying structured post data
-- [x] **GREEN**: Enhance API to properly serialize LinkedIn post data from agent results
-- [x] **GREEN**: Implement post cards UI with enhanced styling and data display
-- [x] **GREEN**: Add proper JSON serialization and HTML escaping for security
-- [x] **REFACTOR**: Add professional post card styling with hover effects and improved UX
-- [x] **VALIDATION**: End-to-end tested with AgentHistoryList properly serialized to JSON
+**RED Phase: Connection Tests**
+- [x] **Test 4.0.1**: Chrome CDP connection detection
+  - [x] Test `BrowserSession(cdp_url="http://localhost:9222")` connection
+  - [x] Test connection failure handling when Chrome not running with debug port
+  - [x] Test multiple Chrome instance handling
+  - [x] **Verify**: Current implementation cannot connect to running Chrome (RED confirmed - 9/9 tests failing)
 
-### **COMPLETED - Enhanced Error Handling and User Experience**
-- [x] Implement comprehensive error responses with debugging information
-- [x] Add proper status indicators and user-friendly messages
-- [x] Fix Flask async compatibility issues with `asyncio.run()`
-- [x] Create complete test coverage (6 new tests) following TDD methodology
-- [x] **BUG FIXES**: Fixed method name mismatch and JSON serialization issues during testing
+- [x] **Test 4.0.2**: User Chrome Profile Integration  
+  - [x] Test agent can access existing Chrome tabs and sessions
+  - [x] Test LinkedIn login state preservation from user's Chrome
+  - [x] Test tab management (creating new tabs vs using existing)
+  - [x] **Verify**: Agent cannot access user's logged-in LinkedIn session (RED confirmed)
 
-### **COMPLETED - Documentation and Testing**
-- [x] Update CHANGELOG.md with detailed implementation summary
-- [x] Update TASKS.md with phase completion status
-- [x] All tests passing (20/20) including both new debugging tests and existing functionality
-- [x] **END-TO-END VALIDATION**: Successfully tested complete workflow in production
-- [x] Git commit and merge to master branch completed
+- [x] **Test 4.0.3**: CDP Error Handling
+  - [x] Test graceful fallback when CDP connection fails
+  - [x] Test handling of Chrome crashes during automation
+  - [x] Test connection recovery and reconnection logic
+  - [x] **Verify**: No error handling for CDP failures (RED confirmed)
 
-### **END-TO-END TESTING VALIDATION RESULTS:**
+**GREEN Phase: Implement CDP Connection**
+- [x] **Implementation 4.0.1**: Update Harvester for CDP Connection
+  ```python
+  # In harvester.py - new CDP connection method
+  class Harvester:
+      async def _setup_cdp_connection(self) -> Browser:
+          """Connect to user's running Chrome via CDP"""
+          return Browser(BrowserConfig(cdp_url="http://localhost:9222"))
+      
+      async def harvest(self, prompt: str):
+          browser = await self._get_browser_with_fallback()
+          agent = Agent(task=prompt, llm=self.llm, browser=browser)
+          return await agent.run()
+  ```
 
-**Test Prompt:** `"like first 3 posts on linkedin feed"`
+- [x] **Implementation 4.0.2**: Chrome Connection Detection
+  - [x] Add method to detect if Chrome is running with debug port
+  - [x] Add Chrome startup instructions for users
+  - [x] Add connection status validation before agent execution
+  - [x] **Verify**: Agent successfully connects to user's Chrome (GREEN confirmed - 9/9 tests passing)
 
-**COMPLETE WORKFLOW VALIDATED:**
-1. **PromptTransformer**: Enhanced prompt with professional LinkedIn guidelines
-2. **Harvester**: Created browser-use Agent with enhanced prompt
-3. **Agent Execution**: Successfully navigated LinkedIn, handled manual login, executed 3 like actions
-4. **Debugging Visibility**: All UI sections populated with real execution data
-5. **Success Confirmation**: "Successfully liked the first three posts on the LinkedIn feed"
+- [x] **Implementation 4.0.3**: Error Handling & Fallbacks
+  - [x] Implement graceful fallback to standalone browser when CDP fails
+  - [x] Add connection retry logic with exponential backoff
+  - [x] Add comprehensive error messages for common CDP issues
+  - [x] **Verify**: Robust error handling for all CDP scenarios (GREEN confirmed)
 
-**PRODUCTION FEATURES CONFIRMED:**
-- Manual LinkedIn login security working correctly
-- Professional prompt enhancement maintaining community standards  
-- Real-time execution logging with detailed DOM element tracking
-- Beautiful UI with complete debugging information
-- Comprehensive error handling and user feedback
+**REFACTOR Phase: Optimize CDP Integration**
+- [x] **Refactor 4.0.1**: Connection Management
+  - [x] Optimize connection pooling and reuse
+  - [x] Add connection health monitoring with `_verify_connection_health()`
+  - [x] Implement automatic reconnection with exponential backoff retry (3 attempts)
+  - [x] Add Chrome availability checking via `/json/version` endpoint
+  - [x] **Verify**: Same functionality, improved reliability (9/9 tests passing)
 
----
+- [x] **Refactor 4.0.2**: User Experience Improvements
+  - [x] Add comprehensive logging with emojis for clear status tracking
+  - [x] Add specific exception types (CDPConnectionError, ChromeNotRunningError)
+  - [x] Add `get_connection_status()` method for UI integration
+  - [x] Add `get_chrome_startup_command()` helper for users
+  - [x] **Verify**: Enhanced user experience, same core functionality (9/9 tests passing)
 
-## **CURRENT STATUS SUMMARY**
+**✅ TASK 4.0.1 FULLY COMPLETED** - All TDD phases (RED-GREEN-REFACTOR) successfully completed
 
-### COMPLETED PHASES:
-1. **Phase 1**: PromptTransformer Implementation (RED-GREEN-REFACTOR complete)
-2. **Phase 2**: Harvester Simplification and Integration (RED-GREEN-REFACTOR complete)  
-3. **Phase 3**: Debugging and Visibility Enhancements (RED-GREEN-REFACTOR complete)
+#### **Task 4.0.4: UI Integration (RED-GREEN-REFACTOR)**
 
-### MAJOR ACHIEVEMENTS:
-- **Working End-to-End Demo**: Complete user workflow from web UI to LinkedIn automation
-- **Simplified Architecture**: From 8 modules to 4, 50% code reduction achieved
-- **Enhanced User Experience**: Full visibility into prompt transformation and agent actions
-- **Robust Testing**: 11 passing tests with strict TDD methodology maintained
-- **Professional UI**: Modern, responsive dark theme with comprehensive debugging features
+**RED Phase: Chrome Status UI Tests**
+- [ ] **Test 4.0.4**: Chrome Connection Status Display
+  - [ ] Test UI shows Chrome connection status (connected/disconnected)
+  - [ ] Test UI shows LinkedIn login status in connected Chrome
+  - [ ] Test UI provides Chrome startup instructions when not connected
+  - [ ] **Verify**: Current UI doesn't show Chrome status (RED expected)
 
-### CURRENT METRICS:
-- **Test Coverage**: 11/11 tests passing (100% success rate)
-- **Code Architecture**: 4 core modules (agent, prompt_transformer, harvester, logger)
-- **API Endpoints**: 1 streamlined `/api/process` endpoint with debugging capabilities
-- **Frontend**: Complete single-page application with real-time feedback
-- **Documentation**: Comprehensive CHANGELOG.md, TASKS.md, and SYSTEM_DESIGN.md
+**GREEN Phase: Implement Chrome Status UI**
+- [ ] **Implementation 4.0.4**: Add Chrome Status Indicators
+  - [ ] Update Flask API to include Chrome connection status
+  - [ ] Update frontend to display Chrome/LinkedIn status
+  - [ ] Add Chrome startup command generator for user's OS
+  - [ ] **Verify**: Users can see Chrome connection status (GREEN confirmed)
 
-### NEXT IMMEDIATE STEPS:
-1. **Commit Phase 3**: Commit debugging enhancements to feature branch
-2. **Create Pull Request**: Open PR to merge `feature/debugging-visibility-enhancements` to main
-3. **Merge to Main**: Complete Phase 3 integration
-4. **Plan Phase 4**: Define production readiness and advanced feature requirements
+**REFACTOR Phase: Polish Status UI**
+- [ ] **Refactor 4.0.4**: Enhanced Status Display
+  - [ ] Add real-time connection monitoring
+  - [ ] Add visual indicators (green/red status dots)
+  - [ ] Add helpful error messages and troubleshooting tips
+  - [ ] **Verify**: Same functionality, better UX
 
----
+### **Success Criteria for Phase 4.0:**
+- ✅ Agent connects to user's running Chrome instance
+- ✅ Preserves all LinkedIn login sessions and cookies
+- ✅ Maintains natural browsing behavior (no automation detection)
+- ✅ Robust error handling and fallback mechanisms
+- ✅ Clear user instructions and status indicators
+- ✅ Full test coverage for CDP connection scenarios
 
-## **PHASE 4: DOCUMENTATION & DEPLOYMENT (TDD)**
-
-**Objective:** Document new capabilities and prepare for production.
-
-### **4.1: Documentation Updates**
-
-- [ ] **Task 4.1.1: Update README.md**
-  - [ ] Document new natural language capabilities
-  - [ ] Add example prompts (simple to complex)
-  - [ ] Update setup instructions
-  - [ ] Add troubleshooting guide
-
-- [ ] **Task 4.1.2: Update Technical Documentation**
-  - [ ] Update `SYSTEM_DESIGN.md` with new architecture
-  - [ ] Document removed constraints
-  - [ ] Add performance benchmarks
-  - [ ] Update API documentation
-
-### **4.2: User Guide & Examples**
-
-- [ ] **Task 4.2.1: Create Prompt Examples Library**
-  - [ ] Basic actions: "Like posts about X"
-  - [ ] Advanced actions: "Find and engage with Y professionals"
-  - [ ] Multi-step workflows: "Research topic X, then do Y"
-  - [ ] Profile management: "Update my Z section"
-
-- [ ] **Task 4.2.2: Best Practices Guide**
-  - [ ] Effective prompt writing
-  - [ ] Professional conduct guidelines
-  - [ ] Rate limiting awareness
-  - [ ] Safety considerations
-
-### **4.3: Final Validation**
-
-- [ ] **Task 4.3.1: Full System Test**
-  - [ ] Test all documented examples
-  - [ ] Validate performance improvements
-  - [ ] Confirm no regressions
-  - [ ] **Success Criteria**: All examples work, system is more capable than before
-
-- [ ] **Task 4.3.2: Code Review & Cleanup**
-  - [ ] Remove unused files/code
-  - [ ] Update dependency list
-  - [ ] Final lint and formatting
-  - [ ] Update `CHANGELOG.md`
+### **Implementation Notes:**
+- **Chrome Startup Command**: `/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222`
+- **CDP URL**: `http://localhost:9222` (standard Chrome debug port)
+- **Fallback Strategy**: Use existing browser-use default behavior if CDP fails
+- **Security**: No access to user's passwords/sensitive data - only tab control
 
 ---
 
-## **SUCCESS METRICS**
+## **PHASE 4: ENHANCED PROMPT OPTIMIZATION (TDD)**
 
-**Quantitative:**
-- [ ] Lines of code reduced by >50%
-- [ ] API calls reduced by >40%
-- [ ] Rate limiting incidents reduced by >70%
-- [ ] Response time improved by >30%
+**Branch:** `feature/enhanced-prompt-optimization` 
+**Objective:** Transform PromptTransformer from "guideline adder" to "browser automation script generator"
 
-**Qualitative:**
-- [ ] Support for complex multi-step tasks
-- [ ] Natural language interface (no syntax learning)
-- [ ] Enhanced LinkedIn capabilities
-- [ ] Maintained safety and reliability
+**Research Completed:** Browser-use documentation and awesome-prompts analysis
+- Browser-use performs best with numbered, step-by-step instructions
+- Specific selectors, timeframes, and error handling are critical
+- Extended system messages for LinkedIn-specific automation rules needed
+- Prompt templates for common actions improve consistency and reliability
 
-**Test Coverage:**
-- [ ] >90% test coverage maintained
-- [ ] All tests passing (11/11) including both new debugging tests and existing functionality
-- [ ] Zero regressions in core functionality
-- [ ] Comprehensive edge case handling
+### **TDD CYCLE 1: Extended System Messages Integration**
 
----
+**Objective:** Add LinkedIn-specific extended system messages to browser-use Agent
 
-## **ROLLBACK PLAN**
+#### **RED Phase: Create Failing Tests**
+- [ ] **Test 1.1**: Verify Harvester creates Agent with `extend_system_message` parameter
+- [ ] **Test 1.2**: Verify extended system message contains LinkedIn-specific automation rules
+- [ ] **Test 1.3**: Verify extended system message includes rate limiting instructions
+- [ ] **Test 1.4**: Verify extended system message includes error handling guidelines
+- [ ] **Test 1.5**: Test API response includes extended system message info in debugging output
 
-If critical issues arise during transition:
-- [ ] **Phase 1 Rollback**: Revert to `interpreter.py` + `Command` objects
-- [ ] **Phase 2 Rollback**: Disable advanced features, keep basic transformer
-- [ ] **Full Rollback**: Git revert to pre-transition commit
+#### **GREEN Phase: Implement Minimum Viable Solution**
+- [ ] **Implementation 1.1**: Add `get_linkedin_system_extensions()` method to PromptTransformer
+- [ ] **Implementation 1.2**: Update Harvester to pass `extend_system_message` to Agent creation
+- [ ] **Implementation 1.3**: Create LinkedIn-specific automation rules content
+- [ ] **Implementation 1.4**: Update Flask API to include system message info in response
+- [ ] **Implementation 1.5**: Update frontend to display extended system message details
 
-**Rollback Triggers:**
-- [ ] >50% increase in error rate
-- [ ] Critical functionality completely broken
-- [ ] Unresolvable security vulnerabilities
-- [ ] Performance degradation >2x
+#### **REFACTOR Phase: Optimize and Clean**
+- [ ] **Refactor 1.1**: Extract system message content to configuration file
+- [ ] **Refactor 1.2**: Add comprehensive documentation for system message rules
+- [ ] **Refactor 1.3**: Optimize system message for token efficiency
+- [ ] **Refactor 1.4**: Add CSS styling for system message display in UI
 
----
-
-This plan maintains our TDD discipline while transitioning to a more powerful, flexible architecture. Each phase builds incrementally with continuous validation of functionality.
-
-## **PHASE 3: DEBUGGING & VISIBILITY ENHANCEMENTS (TDD)**
-
-**Objective:** Improve debugging capabilities and user visibility into agent actions after successful end-to-end demo.
-
-**Context:** End-to-end demo working - browser-use agent navigates LinkedIn and finds posts, but UI lacks visibility into transformed prompts and detailed agent actions. Need better debugging and error handling.
-
-### **3.1: Enhanced UI Visibility (TDD)**
-
-#### **Task 3.1.1: Show Transformed Prompt in UI (RED-GREEN-REFACTOR)**
-
-- [x] **RED - Transformed Prompt Display Tests**
-  - [x] Test that `/api/process` endpoint returns both original and transformed prompts
-  - [x] Test that UI displays both prompts clearly to user
-  - [x] Test formatting and readability of prompt comparison
-  - [x] **Verify**: Current implementation doesn't show transformed prompt (RED confirmed)
-
-- [x] **GREEN - Implement Transformed Prompt Display**
-  - [x] Update Flask `/api/process` to return `{original_prompt, transformed_prompt, result}`
-  - [x] Update frontend JavaScript to display transformed prompt
-  - [x] Add clear section in UI showing "Original → Enhanced" prompt flow
-  - [x] **Verify**: User can see exactly how their prompt was enhanced (GREEN confirmed)
-
-- [x] **REFACTOR - Optimize Prompt Display UX**
-  - [x] Improve visual design of prompt comparison
-  - [x] Add collapsible sections for better space usage
-  - [x] Add explanation of why prompt was enhanced
-  - [x] **Verify**: Same functionality, better user experience
-
-#### **Task 3.1.2: Detailed Agent Action Logging (RED-GREEN-REFACTOR)**
-
-- [x] **RED - Agent Action Visibility Tests**
-  - [x] Test that browser-use agent logs are captured and displayed
-  - [x] Test real-time streaming of agent actions to UI
-  - [x] Test error handling when agent encounters issues
-  - [x] **Verify**: Current implementation doesn't show agent logs (RED confirmed)
-
-- [x] **GREEN - Implement Agent Action Streaming**
-  - [x] Capture browser-use agent logs and actions in real-time
-  - [x] Stream agent progress to UI via WebSocket or Server-Sent Events
-  - [x] Display step-by-step agent actions: navigation, clicks, data extraction
-  - [x] Show detailed error messages when agent fails
-  - [x] **Verify**: User can see exactly what agent is doing (GREEN confirmed)
-
-- [x] **REFACTOR - Optimize Logging Performance**
-  - [x] Implement log filtering (info/debug/error levels)
-  - [x] Add log persistence for debugging
-  - [x] Optimize streaming performance for long-running tasks
-  - [x] **Verify**: Same visibility, better performance
-
-### **3.2: Error Handling & Data Extraction (TDD)**
-
-#### **Task 3.2.1: Structured Data Extraction (RED-GREEN-REFACTOR)**
-
-- [x] **RED - Data Extraction Tests**
-  - [x] Test extraction of post data from browser-use agent results
-  - [x] Test handling of various result formats (text, structured data, errors)
-  - [x] Test display of extracted posts in UI "Fetched Posts" section
-  - [x] **Verify**: Current implementation doesn't extract structured post data (RED confirmed)
-
-- [x] **GREEN - Implement Post Data Extraction**
-  - [x] Parse browser-use agent results to extract structured post data
-  - [x] Convert agent output to FetchedPost objects when possible
-  - [x] Display extracted posts in UI with proper formatting
-  - [x] Handle cases where agent returns text vs structured data
-  - [x] **Verify**: Posts are properly extracted and displayed (GREEN confirmed)
-
-- [x] **REFACTOR - Optimize Data Processing**
-  - [x] Improve parsing robustness for various agent output formats
-  - [x] Add data validation and cleaning
-  - [x] Optimize post display UI components
-  - [x] **Verify**: Same functionality, more reliable data extraction
-
-#### **Task 3.2.2: Enhanced Error Handling (RED-GREEN-REFACTOR)**
-
-- [x] **RED - Error Handling Tests**
-  - [x] Test handling of browser-use agent failures
-  - [x] Test network timeout scenarios
-  - [x] Test LinkedIn access issues (rate limits, login failures)
-  - [x] Test graceful degradation and user feedback
-  - [x] **Verify**: Current implementation doesn't handle errors gracefully (RED confirmed)
-
-- [x] **GREEN - Implement Comprehensive Error Handling**
-  - [x] Catch and categorize different types of agent failures
-  - [x] Provide clear error messages and recovery suggestions
-  - [x] Implement retry logic for transient failures
-  - [x] Show error details in UI debugging section
-  - [x] **Verify**: Errors are handled gracefully with clear user feedback (GREEN confirmed)
-
-- [x] **REFACTOR - Improve Error UX**
-  - [x] Categorize errors by severity and type
-  - [x] Add suggested actions for common error scenarios
-  - [x] Implement background retry for recoverable errors
-  - [x] **Verify**: Same error handling, better user experience
-
-### **3.3: Development & Testing Tools (TDD)**
-
-#### **Task 3.3.1: Debug Mode & Logging (RED-GREEN-REFACTOR)**
-
-- [x] **RED - Debug Tools Tests**
-  - [x] Test debug mode toggle in UI
-  - [x] Test detailed logging configuration
-  - [x] Test log export functionality
-  - [x] **Verify**: No debug tools currently available (RED confirmed)
-
-- [x] **GREEN - Implement Debug Tools**
-  - [x] Add debug mode toggle in UI
-  - [x] Implement configurable logging levels
-  - [x] Add log export/download functionality
-  - [x] Create debugging dashboard for development
-  - [x] **Verify**: Comprehensive debugging tools available (GREEN confirmed)
-
-- [x] **REFACTOR - Optimize Debug Tools**
-  - [x] Improve debug UI performance
-  - [x] Add log filtering and search
-  - [x] Optimize log storage and rotation
-  - [x] **Verify**: Same debugging capabilities, better performance
-
-**BRANCH**: `feature/debugging-visibility-enhancements` 
-**COMMIT POINTS**: After each completed TDD cycle (RED-GREEN-REFACTOR)
+**COMMIT POINT:** Extended system messages integration complete
 
 ---
 
-## **PHASE 4: PRODUCTION READINESS AND ADVANCED FEATURES (NEXT)**
+### **TDD CYCLE 2: Prompt Template System Architecture**
 
-**Branch:** `feature/production-enhancements` (to be created)
-**Timeline:** Next development cycle
-**Dependencies:** Phase 3 merged to main
+**Objective:** Create modular template system for common LinkedIn actions
 
-### Potential Enhancements for Future Development:
+#### **RED Phase: Create Failing Tests**
+- [ ] **Test 2.1**: Test template detection from user input (like, comment, connect, search, extract)
+- [ ] **Test 2.2**: Test parameter extraction from natural language
+- [ ] **Test 2.3**: Test template application with extracted parameters
+- [ ] **Test 2.4**: Test fallback to enhanced general prompt when no template matches
+- [ ] **Test 2.5**: Test template validation and error handling
 
-#### Real-Time Agent Logging Integration
-- [ ] **Research**: Investigate browser-use Agent callback/logging mechanisms
-- [ ] **Implement**: Real-time streaming of agent actions via WebSocket or Server-Sent Events
-- [ ] **Enhance**: Live progress indicators during long-running LinkedIn automation tasks
+#### **GREEN Phase: Implement Template Foundation**
+- [ ] **Implementation 2.1**: Create `PromptTemplateEngine` class
+- [ ] **Implementation 2.2**: Add template detection logic using keyword matching
+- [ ] **Implementation 2.3**: Create base template structure with parameter placeholders
+- [ ] **Implementation 2.4**: Implement parameter extraction using NLP patterns
+- [ ] **Implementation 2.5**: Update PromptTransformer to use template engine
 
-#### Session Persistence and User Management
-- [ ] **Investigate**: browser-use persistent session capabilities for LinkedIn login retention
-- [ ] **Implement**: User settings and preferences storage
-- [ ] **Add**: Session management for multiple LinkedIn accounts
+#### **REFACTOR Phase: Optimize Template System**
+- [ ] **Refactor 2.1**: Create template configuration file (YAML/JSON)
+- [ ] **Refactor 2.2**: Add template inheritance and composition
+- [ ] **Refactor 2.3**: Optimize parameter extraction accuracy
+- [ ] **Refactor 2.4**: Add comprehensive logging for template selection
 
-#### Advanced LinkedIn Automation Features
-- [ ] **Expand**: Support for LinkedIn messaging automation
-- [ ] **Add**: Advanced post filtering and targeting capabilities
-- [ ] **Implement**: Scheduling and batch operation support
-
-#### Performance and Scalability
-- [ ] **Optimize**: Agent execution performance and memory usage
-- [ ] **Add**: Background task processing for long-running operations
-- [ ] **Implement**: Rate limiting and LinkedIn API compliance measures
-
-#### Analytics and Reporting
-- [ ] **Create**: Dashboard for automation statistics and success metrics
-- [ ] **Add**: Export capabilities for automation results
-- [ ] **Implement**: Historical data analysis and trends
+**COMMIT POINT:** Template system architecture complete
 
 ---
 
-## Development Status Summary
+### **TDD CYCLE 3: LinkedIn Action Templates Implementation**
 
-### COMPLETED PHASES:
-1. **Phase 1**: PromptTransformer Implementation (RED-GREEN-REFACTOR complete)
-2. **Phase 2**: Harvester Simplification and Integration (RED-GREEN-REFACTOR complete)  
-3. **Phase 3**: Debugging and Visibility Enhancements (RED-GREEN-REFACTOR complete)
+**Objective:** Create specific templates for common LinkedIn actions
 
-### MAJOR ACHIEVEMENTS:
-- **Working End-to-End Demo**: Complete user workflow from web UI to LinkedIn automation
-- **Simplified Architecture**: From 8 modules to 4, 50% code reduction achieved
-- **Enhanced User Experience**: Full visibility into prompt transformation and agent actions
-- **Robust Testing**: 11 passing tests with strict TDD methodology maintained
-- **Professional UI**: Modern, responsive dark theme with comprehensive debugging features
+#### **RED Phase: Create Failing Tests for Each Template**
+- [ ] **Test 3.1**: Post Engagement Template (like, react, comment)
+- [ ] **Test 3.2**: Content Search Template (find posts by topic/author)
+- [ ] **Test 3.3**: Profile Actions Template (connect, follow, message)
+- [ ] **Test 3.4**: Content Creation Template (post, article, update)
+- [ ] **Test 3.5**: Data Extraction Template (profile info, post data, metrics)
 
-### CURRENT METRICS:
-- **Test Coverage**: 11/11 tests passing (100% success rate)
-- **Code Architecture**: 4 core modules (agent, prompt_transformer, harvester, logger)
-- **API Endpoints**: 1 streamlined `/api/process` endpoint with debugging capabilities
-- **Frontend**: Complete single-page application with real-time feedback
-- **Documentation**: Comprehensive CHANGELOG.md, TASKS.md, and SYSTEM_DESIGN.md
+#### **GREEN Phase: Implement Core Templates**
+- [ ] **Template 3.1**: Post Engagement Actions
+  ```
+  USER: "like 3 posts about AI"
+  TEMPLATE: 
+  1. Navigate to linkedin.com and verify login
+  2. Go to main feed and scroll to load content
+  3. Find exactly 3 posts containing keywords: [AI, artificial intelligence, machine learning]
+  4. For each post: locate like button, click, wait 2s, verify state change
+  5. Extract and return: author names, post previews, timestamps
+  ```
 
-### NEXT IMMEDIATE STEPS:
-1. **Commit Phase 3**: Commit debugging enhancements to feature branch
-2. **Create Pull Request**: Open PR to merge `feature/debugging-visibility-enhancements` to main
-3. **Merge to Main**: Complete Phase 3 integration
-4. **Plan Phase 4**: Define production readiness and advanced feature requirements
+- [ ] **Template 3.2**: Content Search Actions
+  ```
+  USER: "find posts by John Smith about marketing"
+  TEMPLATE:
+  1. Navigate to LinkedIn search
+  2. Use filters: People = "John Smith", Content = "marketing"
+  3. Extract first 5 matching posts with full metadata
+  4. Return structured data with engagement metrics
+  ```
 
-The LinkedIn AI Agent is now a fully functional, professionally developed application with comprehensive debugging capabilities and excellent user experience. Ready for production deployment with manual LinkedIn login for security compliance.
+- [ ] **Template 3.3**: Profile Actions
+- [ ] **Template 3.4**: Content Creation
+- [ ] **Template 3.5**: Data Extraction
+
+#### **REFACTOR Phase: Optimize Templates**
+- [ ] **Refactor 3.1**: Add advanced parameter extraction (numbers, names, topics)
+- [ ] **Refactor 3.2**: Create reusable template components (navigation, waiting, verification)
+- [ ] **Refactor 3.3**: Add comprehensive error handling for each template
+- [ ] **Refactor 3.4**: Optimize for LinkedIn DOM structure updates
+
+**COMMIT POINT:** Core LinkedIn action templates complete
+
+---
+
+### **TDD CYCLE 4: LinkedIn DOM Knowledge Integration**
+
+**Objective:** Add comprehensive LinkedIn selector and interaction knowledge
+
+#### **RED Phase: Create Failing Tests**
+- [ ] **Test 4.1**: Test current LinkedIn selector accuracy
+- [ ] **Test 4.2**: Test fallback selector chains for critical elements
+- [ ] **Test 4.3**: Test DOM structure change detection
+- [ ] **Test 4.4**: Test wait conditions for dynamic content loading
+- [ ] **Test 4.5**: Test rate limiting and anti-automation countermeasures
+
+#### **GREEN Phase: Implement DOM Knowledge**
+- [ ] **Implementation 4.1**: Create LinkedIn selector database
+  ```python
+  LINKEDIN_SELECTORS = {
+      'like_button': [
+          '[data-control-name="like_toggle"]',
+          '.react-button__trigger',
+          '.feed-shared-social-action-bar__action-button[aria-label*="like"]'
+      ],
+      'post_content': [
+          '.feed-shared-update-v2__description',
+          '.feed-shared-text',
+          '.update-components-text'
+      ]
+      # ... comprehensive selector library
+  }
+  ```
+
+- [ ] **Implementation 4.2**: Add intelligent waiting strategies
+- [ ] **Implementation 4.3**: Create DOM change detection utilities
+- [ ] **Implementation 4.4**: Add anti-automation countermeasure handling
+- [ ] **Implementation 4.5**: Implement selector validation and updating system
+
+#### **REFACTOR Phase: Optimize DOM Interactions**
+- [ ] **Refactor 4.1**: Create selector testing and validation framework
+- [ ] **Refactor 4.2**: Add automated selector discovery and updating
+- [ ] **Refactor 4.3**: Optimize wait times and loading detection
+- [ ] **Refactor 4.4**: Create comprehensive LinkedIn interaction patterns
+
+**COMMIT POINT:** LinkedIn DOM knowledge integration complete
+
+---
+
+### **TDD CYCLE 5: Advanced Error Handling & Resilience**
+
+**Objective:** Add comprehensive error handling and automation resilience
+
+#### **RED Phase: Create Failing Tests for Error Scenarios**
+- [ ] **Test 5.1**: Test handling of LinkedIn rate limiting
+- [ ] **Test 5.2**: Test recovery from network interruptions
+- [ ] **Test 5.3**: Test handling of UI changes and missing elements
+- [ ] **Test 5.4**: Test authentication session expiration handling
+- [ ] **Test 5.5**: Test graceful degradation when automation is blocked
+
+#### **GREEN Phase: Implement Error Handling**
+- [ ] **Implementation 5.1**: Add retry mechanisms with exponential backoff
+- [ ] **Implementation 5.2**: Create comprehensive error classification system
+- [ ] **Implementation 5.3**: Add graceful fallback strategies
+- [ ] **Implementation 5.4**: Implement session management and recovery
+- [ ] **Implementation 5.5**: Add user notification system for manual intervention
+
+#### **REFACTOR Phase: Optimize Resilience**
+- [ ] **Refactor 5.1**: Create error analytics and reporting
+- [ ] **Refactor 5.2**: Add predictive error prevention
+- [ ] **Refactor 5.3**: Optimize recovery strategies based on error patterns
+- [ ] **Refactor 5.4**: Create comprehensive error documentation
+
+**COMMIT POINT:** Advanced error handling complete
+
+---
+
+### **TDD CYCLE 6: Integration & UI Enhancement**
+
+**Objective:** Integrate all enhancements and update UI for new capabilities
+
+#### **RED Phase: Create Integration Tests**
+- [ ] **Test 6.1**: Test complete workflow with new prompt optimization
+- [ ] **Test 6.2**: Test UI display of template selection and parameters
+- [ ] **Test 6.3**: Test debugging output for enhanced prompts
+- [ ] **Test 6.4**: Test performance impact of new enhancements
+- [ ] **Test 6.5**: Test backward compatibility with existing functionality
+
+#### **GREEN Phase: Implement Integration**
+- [ ] **Implementation 6.1**: Update Flask API to return template and optimization info
+- [ ] **Implementation 6.2**: Update frontend to display:
+  - Selected template name and parameters
+  - Extended system message details
+  - DOM selector information used
+  - Error handling strategies applied
+- [ ] **Implementation 6.3**: Add real-time template preview functionality
+- [ ] **Implementation 6.4**: Create comprehensive logging for optimization process
+
+#### **REFACTOR Phase: Optimize User Experience**
+- [ ] **Refactor 6.1**: Add template selection override functionality
+- [ ] **Refactor 6.2**: Create advanced debugging mode toggle
+- [ ] **Refactor 6.3**: Optimize UI responsiveness and loading states
+- [ ] **Refactor 6.4**: Add comprehensive user documentation
+
+**COMMIT POINT:** Full integration complete
+
+---
+
+### **PHASE 4 SUCCESS METRICS**
+
+**Performance Improvements:**
+- [ ] 80%+ improvement in LinkedIn automation success rate
+- [ ] 60%+ reduction in browser-use agent errors
+- [ ] 50%+ improvement in action completion time
+- [ ] 90%+ accuracy in template parameter extraction
+
+**User Experience Enhancements:**
+- [ ] Natural language input with automatic optimization
+- [ ] Real-time template selection and parameter preview
+- [ ] Comprehensive debugging information display
+- [ ] Professional automation script generation
+
+**Technical Architecture:**
+- [ ] Modular template system for easy extension
+- [ ] Comprehensive LinkedIn DOM knowledge base
+- [ ] Advanced error handling and resilience
+- [ ] Full backward compatibility maintained
+
+---
+
+### **IMPLEMENTATION PRIORITY ORDER**
+
+1. **HIGHEST PRIORITY**: TDD Cycle 1 (Extended System Messages) - Immediate browser-use performance improvement
+2. **HIGH PRIORITY**: TDD Cycle 2 (Template Architecture) - Foundation for all enhancements
+3. **MEDIUM PRIORITY**: TDD Cycle 3 (LinkedIn Templates) - Core functionality enhancement
+4. **MEDIUM PRIORITY**: TDD Cycle 4 (DOM Knowledge) - Reliability improvement
+5. **LOW PRIORITY**: TDD Cycle 5 (Error Handling) - Advanced resilience
+6. **LOW PRIORITY**: TDD Cycle 6 (Integration & UI) - Polish and user experience
+
+**COMMIT STRATEGY:**
+- Commit after each TDD cycle completion
+- Update CHANGELOG.md and TASKS.md before each commit
+- Create comprehensive test coverage for each enhancement
+- Maintain strict red-green-refactor methodology
+
+---
